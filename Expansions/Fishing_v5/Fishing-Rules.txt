@@ -1,0 +1,40 @@
+SETUP:
+• Shuffle Fishing Deck & place beside the board (shuffle in various events to make fishing harder or easier or simply add random events).
+
+GAMEPLAY:
+When on an empty (contains no other action (ie. mining) or component such as: another player, NPC, gold nugget, event token, etc.) water space, player may take Fishing Action which includes:
+
+1. Steeling
+Discard 1 Poker Card, plus any Fish Cards, to determine "Fishing Effort" (J/Q/K=10, A=11).
+Discarded Fish Cards add +1/Card to Fishing Effort.
+
+2. Reeling
+Reveal Fish Cards from Fishing Deck until their total value meets or exceeds your Fishing Effort. If exceeded, discard last drawn Card.
+If Fishing Deck is empty, reshuffle discard pile to form new draw pile.
+If total value matches Fishing Effort exactly, and at least 1 fish was reeled, gain +1 LP.
+
+3. Creeling
+For each successfully reeled Fish Card, gain immediate reward on card (ie. +1 LP), then choose:
+a) Cull (Discard Fish Card).
+b) Keep (Place Fish Card facedown in pile on your board).
+c) Consume (Gain "Consume Rewards" indicated, then discard Fish Card).
+
+Note:
+• If an Event card is drawn, apply its effects to the remainder of the action. Any other drawn Event cards this turn are ignored. Event cards are discarded normally after being used except Legendary, which are returned to the box.
+• The player's carry limit of Fish Cards may not exceed 5 cards. If this limit is exceeded, player must immediately discard Fish Cards until limit is no longer exceeded.
+• During a successful Rob action, the player may steal 1 Fish card (choosing which) from the other player.
+• When player ends a Move Action on a Ranch space, they may choose to discard any/all Fish cards in their possession for the total money indicated on them, rounded down to the nearest $10.
+
+
+VARIANTS:
+1. Press-Your-Luck
+During the "Reeling Phase", if the total value of drawn Fish Cards exceeds your "Fishing Effort" value, then all Fish Cards drawn during the action are discarded, ending the action. No rewards gained.
+
+2. Take The Bait
+The suit color (black/red) of the discarded poker card determines the type of bait used. During the "Reeling Phase", if a fish card is drawn that does not eat this bait (black/red diet icons on fish card) then that card is immediately discarded and is not considered reeled, ignoring its might value.
+
+3. Legendary Run
+Instead of returning Legendary cards to the box, return them to the discard pile to be reshuffled back into the game.
+
+4. Limited Pool
+When selling or consuming fish, return Fish card to box instead of discard pile.

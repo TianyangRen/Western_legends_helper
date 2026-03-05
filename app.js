@@ -128,7 +128,7 @@ const DATA = {
       lines: [
         "发起时通缉玩家先弃一张牌",
         "发起者胜：警官玩家得1警官点；通缉玩家受1伤、补1牌、没收牛+半金+半钱（向上取整）、清空通缉点并进警局",
-        "发起者败（含平局/投降）：好人受1伤并补1牌"
+        "发起者败（含平局/投降）：警官玩家受1伤+抽1牌"
       ],
       tags: ["逮捕", "好人", "坏人", "警局"]
     },
@@ -136,8 +136,8 @@ const DATA = {
       section: "决斗",
       title: "决斗",
       lines: [
-        "发起者胜：获得2 LP，对方受伤摸牌",
-        "发起者败（含平局/投降）：自己受伤摸牌"
+        "发起者胜：获得2 LP，对方受1伤+抽1牌",
+        "发起者败（含平局/投降）：受1伤+抽1牌"
       ],
       tags: ["决斗", "LP"]
     },
@@ -146,7 +146,7 @@ const DATA = {
       title: "抢劫",
       lines: [
         "发起者胜：+1通缉点，并抢对方半钱或半金块（向上取整）",
-        "发起者败（含平局/投降）：自己受伤摸牌"
+        "发起者败（含平局/投降）：受1伤+抽1牌"
       ],
       tags: ["抢劫", "通缉", "金钱"]
     },
@@ -154,7 +154,8 @@ const DATA = {
       section: "打匪徒",
       title: "打匪徒（被动触发）",
       lines: [
-        "胜利：移除匪徒；非坏人得 1LP 或 1警官点，坏人得 1LP",
+        "匪徒抽5张战斗牌，选择一张打出",
+        "胜利：移除匪徒；非通缉状态得 1LP 或 1警官点，通缉状态得 1LP",
         "失败（平局算败）：受1伤+抽1牌，并移除匪徒"
       ],
       tags: ["匪徒", "被动", "LP", "警官点"]
@@ -163,6 +164,7 @@ const DATA = {
       section: "警长抓人",
       title: "警长抓人（被动触发）",
       lines: [
+        "警长抽5张战斗牌，选择一张打出",
         "玩家胜：警长回警局，玩家无额外损失",
         "玩家败：受1伤+抽1牌，没收牛+半金+半钱，清空通缉点并进警局"
       ],
@@ -202,7 +204,7 @@ const DATA = {
       title: "银行",
       lines: [
         "兑现金块：使用 1AP，每兑现1金块得 $20 + 1LP",
-        "抢劫银行（每回合限1次）：使用 1AP，赢则+3通缉点并拿$80；输则+1通缉点、受1伤、抽1牌"
+        "抢劫银行（每回合限1次）：使用 1AP，银行保安抓4牌打其中一张，玩家赢则+3通缉点并拿$80；输则+1通缉点、受1伤、抽1牌"
       ],
       tags: ["银行", "金块", "LP", "通缉"]
     },
@@ -239,10 +241,10 @@ const DATA = {
       tags: ["诊所", "治疗", "抽牌"]
     },
     {
-      section: "舞女酒吧",
-      title: "舞女酒吧",
+      section: "俱乐部",
+      title: "俱乐部",
       lines: ["使用 1AP，支付$30获得 1LP，可重复执行"],
-      tags: ["舞女酒吧", "LP"]
+      tags: ["俱乐部", "LP"]
     },
     {
       section: "火车",
@@ -383,7 +385,7 @@ function getCardIcon(tab, item) {
     if (item.section === "酒馆") return "club";
     if (item.section === "杂货店") return "barrel";
     if (item.section === "诊所") return "hospital";
-    if (item.section === "舞女酒吧") return "drama";
+    if (item.section === "俱乐部") return "drama";
     if (item.section === "火车") return "train";
     if (item.section === "逃犯窝点") return "tent-tree";
     if (item.section === "山洞隧道") return "rail-symbol";
@@ -489,7 +491,7 @@ function renderTabContent(tab) {
   if (!items.length) {
     const empty = document.createElement("div");
     empty.className = "card";
-    empty.innerHTML = "<p>没有匹配结果，试试更短关键词或切换子菜单</p>";
+    empty.innerHTML = "<p>无匹配结果，试试切换子菜单</p>";
     holder.appendChild(empty);
     return;
   }
