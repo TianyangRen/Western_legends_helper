@@ -66,7 +66,6 @@ async function init() {
 }
 
 function cacheDom() {
-  dom.fishingApp = document.getElementById("fishingApp");
   dom.drawCount = document.getElementById("drawCount");
   dom.discardCount = document.getElementById("discardCount");
   dom.hubStatus = document.getElementById("hubStatus");
@@ -297,6 +296,8 @@ function renderAll() {
   if (!dom.fishingOverlay.classList.contains("hidden")) {
     renderFishingFlow();
   }
+
+  refreshLucideIcons();
 }
 
 function renderHub() {
@@ -321,7 +322,7 @@ function renderDock() {
     chip.className = `player-chip ${DOCK_POSITIONS[index] || DOCK_POSITIONS[DOCK_POSITIONS.length - 1]}`;
     chip.style.background = chipColor;
     chip.style.color = color.text;
-    chip.innerHTML = `<span>${player.name}</span><small>点数 ${totals.might} | $${totals.money} | 🐟 ${player.creel.length}/5</small>`;
+    chip.innerHTML = `<span>${player.name}</span><small>点数 ${totals.might} | $${totals.money} | <i data-lucide="fish" aria-hidden="true"></i> ${player.creel.length}/5</small>`;
 
     chip.addEventListener("click", () => {
       state.runtime.selectedPlayerId = player.playerId;
@@ -498,7 +499,6 @@ function startSteeling(playerId) {
     reelTotal: 0,
     drawnIds: [],
     pendingFishIds: [],
-    currentFishIndex: 0,
     exactMatch: false,
     creelingSummary: getEmptyCreelingSummary()
   };
@@ -590,10 +590,10 @@ function renderSteelingStep(action) {
 function renderPokerCardInput(selectedRank, selectedSuit) {
   const ranks = ["", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
   const suits = [
-    { id: "spades", label: "黑桃 ♠" },
-    { id: "clubs", label: "梅花 ♣" },
-    { id: "hearts", label: "红桃 ♥" },
-    { id: "diamonds", label: "方块 ♦" }
+    { id: "spades", label: "黑桃 spade" },
+    { id: "clubs", label: "梅花 club" },
+    { id: "hearts", label: "红桃 heart" },
+    { id: "diamonds", label: "方块 diamond" }
   ];
 
   const rankOptions = ranks
@@ -627,8 +627,7 @@ function parseSinglePokerCard(container) {
   return {
     rank,
     suit,
-    value,
-    color: getSuitColor(suit)
+    value
   };
 }
 
@@ -637,10 +636,6 @@ function getPokerRankValue(rank) {
   if (rank === "K" || rank === "Q" || rank === "J") return 10;
   const numeric = Number(rank);
   return Number.isFinite(numeric) ? numeric : 0;
-}
-
-function getSuitColor(suit) {
-  return suit === "hearts" || suit === "diamonds" ? "red" : "black";
 }
 
 function renderReelingStep(action) {
@@ -714,7 +709,6 @@ async function runReelingSequence() {
   });
 
   action.pendingFishIds = pendingFishIds;
-  action.currentFishIndex = 0;
   action.exactMatch = action.reelTotal === action.targetEffort && pendingFishIds.length > 0;
   action.step = "creeling";
 
@@ -732,10 +726,10 @@ async function runReelingSequence() {
 function renderCreelingStep(action) {
   const player = getPlayerById(action.playerId);
   const suitTextMap = {
-    spades: "黑桃 ♠",
-    clubs: "梅花 ♣",
-    hearts: "红桃 ♥",
-    diamonds: "方块 ♦"
+    spades: "spade",
+    clubs: "club",
+    hearts: "heart",
+    diamonds: "diamond"
   };
   const suitText = suitTextMap[action.discardedPokerCard?.suit] || "未知花色";
 
@@ -848,7 +842,6 @@ function resolveCreelingChoice(action, player, cardId, choice) {
   }
 
   action.pendingFishIds = action.pendingFishIds.filter((id) => id !== cardId);
-  action.currentFishIndex = 0;
 
   saveState();
   renderAll();
@@ -1027,4 +1020,10 @@ function shuffle(list) {
 
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function refreshLucideIcons() {
+  if (window.lucide && typeof window.lucide.createIcons === "function") {
+    window.lucide.createIcons();
+  }
 }

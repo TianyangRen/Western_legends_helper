@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="fishing.css" />
 </head>
 <body>
-  <div class="fishing-app" id="fishingApp">
+  <div class="fishing-app">
     <header class="topbar">
       <div class="brand">
         <p class="brand-sub">Western Legends</p>
@@ -37,7 +37,7 @@
 
         <div id="hubStatus" class="hub-status">请先进入设置并生成鱼池。</div>
 
-        <button id="startFishingBtn" class="launch-btn" type="button">🎣 发起钓鱼行动</button>
+        <button id="startFishingBtn" class="launch-btn" type="button">fishing-rod 发起钓鱼行动</button>
       </section>
 
       <aside id="playerDock" class="player-dock" aria-label="玩家页签"></aside>
@@ -95,13 +95,7 @@
     </section>
   </div>
 
-  <template id="cardTileTemplate">
-    <article class="card-tile">
-      <img alt="fish card" />
-      <div class="card-meta"></div>
-    </article>
-  </template>
-
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script src="fishing.js" type="module"></script>
 </body>
 </html>

@@ -241,6 +241,12 @@ input:focus-visible {
   margin-top: 4px;
 }
 
+.player-chip small i {
+  width: 14px;
+  height: 14px;
+  vertical-align: -2px;
+}
+
 .pos-left-top { left: 10px; top: 12%; }
 .pos-left-mid { left: 10px; top: 42%; }
 .pos-left-bottom { left: 10px; top: 72%; }

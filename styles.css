@@ -90,12 +90,6 @@ textarea {
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
-.subtitle {
-  margin: 7px 0 0;
-  color: var(--muted);
-  font-size: 0.92rem;
-}
-
 .app-main {
   padding: 10px 12px 28px;
   max-width: 960px;
@@ -162,12 +156,6 @@ button:active,
 .chip:active,
 .tab-btn:active {
   outline: none;
-}
-
-.hint {
-  margin: 9px 2px 0;
-  color: var(--muted);
-  font-size: 0.84rem;
 }
 
 .primary-nav {
@@ -327,9 +315,5 @@ button:active,
 @media (max-width: 420px) {
   .app-header h1 {
     font-size: 1.18rem;
-  }
-
-  .subtitle {
-    font-size: 0.86rem;
   }
 }
