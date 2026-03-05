@@ -345,6 +345,7 @@ select {
   border-radius: 12px;
   padding: 8px;
   background: var(--panel-2);
+  color: var(--text-main);
 }
 
 .panel-card img {
@@ -358,6 +359,16 @@ select {
 
 .fishing-content .panel-card img {
   height: min(46vh, 380px);
+}
+
+.steeling-fish-card,
+.reeling-board-card {
+  margin-top: 10px;
+}
+
+.steeling-fish-card .notice,
+.reeling-board-card .notice {
+  margin-bottom: 10px;
 }
 
 .creeling-scroll-list {
@@ -445,18 +456,31 @@ select {
   display: flex;
   gap: 8px;
   align-items: center;
+  color: var(--text-main);
+}
+
+.panel-card.selected,
+.creel-choice.selected,
+.overflow-choice.selected {
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  background: rgba(184, 146, 95, 0.18);
+}
+
+.panel-check,
+.steeling-fish {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .overflow-choice {
   width: 100%;
   text-align: left;
   cursor: pointer;
-}
-
-.overflow-choice.selected {
-  border-color: var(--accent-2);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-  background: rgba(184, 146, 95, 0.18);
+  color: var(--text-main);
 }
 
 .creel-choice img {

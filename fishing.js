@@ -367,6 +367,8 @@ function renderPlayerPanel() {
     .map((cardId) => renderPanelCard(cardId, "panel-check"))
     .join("");
 
+  bindHighlightSelection(".panel-check", ".panel-card");
+
   dom.discardSelectedBtn.disabled = false;
   dom.sellSelectedBtn.disabled = false;
 }
@@ -533,8 +535,10 @@ function renderSteelingStep(action) {
         <div class="poker-rows">${pokerCardInput}</div>
       </div>
       <p id="pokerSummary" class="notice">当前扑克牌点数合计：0</p>
-      <p class="notice">弃掉鱼篓中的鱼，每张 +1 点，且会进入公共弃牌堆。</p>
-      <div class="creel-choice-grid">${options || "<div class=\"notice\">鱼篓为空，无法用弃鱼加成。</div>"}</div>
+      <article class="panel-card steeling-fish-card">
+        <p class="notice">弃掉鱼篓中的鱼，每张 +1 点，且会进入公共弃牌堆。</p>
+        <div class="creel-choice-grid">${options || "<div class=\"notice\">鱼篓为空，无法用弃鱼加成。</div>"}</div>
+      </article>
       <div class="modal-actions">
         <button id="confirmSteelingBtn" class="launch-btn" type="button">确认目标点数</button>
       </div>
@@ -552,6 +556,8 @@ function renderSteelingStep(action) {
   pokerRowEl.querySelectorAll(".poker-rank, .poker-suit").forEach((select) => {
     select.addEventListener("change", updatePokerSummary);
   });
+
+  bindHighlightSelection(".steeling-fish", ".creel-choice");
 
   updatePokerSummary();
 
@@ -646,8 +652,10 @@ function renderReelingStep(action) {
     <section class="step-block">
       <h3>Step 3: 收线 (Reeling)</h3>
       <p>目标点数：<strong>${action.targetEffort}</strong> | 当前累计：<strong>${action.reelTotal}</strong></p>
-      <div class="notice">逐张翻牌直到点数达到或超过目标。若超出，最后一张将被弃置。</div>
-      <div class="reveal-row">${cards || "<div class=\"notice\">点击下方按钮开始收线。</div>"}</div>
+      <article class="panel-card reeling-board-card">
+        <p class="notice">逐张翻牌直到点数达到或超过目标。若超出，最后一张将被弃置。</p>
+        <div class="reveal-row">${cards || "<div class=\"notice\">点击下方按钮开始收线。</div>"}</div>
+      </article>
       <div class="modal-actions">
         <button id="runReelingBtn" class="launch-btn" type="button" ${state.runtime.reelingInProgress ? "disabled" : ""}>${state.runtime.reelingInProgress ? "收线中..." : "开始收线"}</button>
       </div>
@@ -972,6 +980,21 @@ function getPlayerCreelTotals(player) {
     },
     { might: 0, money: 0 }
   );
+}
+
+function bindHighlightSelection(inputSelector, containerSelector) {
+  const inputs = Array.from(document.querySelectorAll(inputSelector));
+  inputs.forEach((input) => {
+    const container = input.closest(containerSelector);
+    if (!container) return;
+
+    const sync = () => {
+      container.classList.toggle("selected", Boolean(input.checked));
+    };
+
+    input.addEventListener("change", sync);
+    sync();
+  });
 }
 
 function getEmptyCreelingSummary() {
