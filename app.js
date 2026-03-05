@@ -5,9 +5,10 @@ const DATA = {
       title: "开始阶段结算",
       lines: [
         "移动火车到下一个检查点",
+        "翻卡移动旅行商人到下一个检查点",
         "结算所有写明“回合开始”的能力与效果",
-        "资源三选一：获 $20 / 抽2张牌 / 获 $10并抽1张牌",
-        "声明并激活本回合使用的 1个坐骑 + 1个武器"
+        "三选一：$20 / 抽2张牌 / $10 + 抽1张牌",
+        "声明本回合使用的 1个坐骑 + 1个武器"
       ],
       tags: ["开始", "资源", "装备"]
     },
@@ -15,11 +16,11 @@ const DATA = {
       section: "行动",
       title: "行动阶段总则",
       lines: [
-        "你有 3个行动点（AP），可自由分配",
+        "你有 3个行动点 (AP)，可自由分配",
         "也可执行不消耗AP的免费行动",
         "若有“移动前掷冒险骰”的需求，先结算骰子后再移动"
       ],
-      tags: ["行动点", "免费行动", "冒险骰"]
+      tags: ["AP", "免费行动", "冒险骰"]
     },
     {
       section: "结束",
@@ -44,19 +45,19 @@ const DATA = {
     {
       section: "耗费1AP",
       title: "地点行动 / 收购地契",
-      lines: ["执行所在地行动，或按规则支付费用收购地契"],
+      lines: ["执行所在地行动，或支付费用购买地契"],
       tags: ["AP", "地点", "地契"]
     },
     {
       section: "耗费1AP",
       title: "打工",
-      lines: ["在任意“地点”可花1AP直接获 $10"],
+      lines: ["在任意地点可花 1AP 直接获 $10","(有人打工时拥有地契者还可获 $10)"],
       tags: ["AP", "打工", "金钱"]
     },
     {
       section: "耗费1AP",
       title: "卡牌行动",
-      lines: ["执行手牌上的行动文字"],
+      lines: ["执行手牌上的行动文字（Action）"],
       tags: ["AP", "卡牌"]
     },
     {
@@ -126,7 +127,7 @@ const DATA = {
     },
     {
       section: "逮捕",
-      title: "🛡️ 逮捕（好人抓坏人）",
+      title: "逮捕（好人抓坏人）",
       lines: [
         "发起者胜：好人得1警官点；被捕坏人受1伤、补1牌、没收牛+半金+半钱（向上取整）、清空通缉点并进警局",
         "发起者败（含平局/投降）：好人受1伤并补1牌"
@@ -135,7 +136,7 @@ const DATA = {
     },
     {
       section: "决斗",
-      title: "⚔️ 决斗",
+      title: "决斗",
       lines: [
         "发起者胜：获得2 LP，对方受伤摸牌",
         "发起者败（含平局/投降）：自己受伤摸牌"
@@ -144,7 +145,7 @@ const DATA = {
     },
     {
       section: "抢劫",
-      title: "💰 抢劫",
+      title: "抢劫",
       lines: [
         "发起者胜：+1通缉点，并抢对方半钱或半金块（向上取整）",
         "发起者败（含平局/投降）：自己受伤摸牌"
@@ -153,16 +154,16 @@ const DATA = {
     },
     {
       section: "打匪徒",
-      title: "🤠 打匪徒（被动触发）",
+      title: "打匪徒（被动触发）",
       lines: [
-        "胜利：移除匪徒；非坏人得1 LP或1警官点，坏人得1 LP",
+        "胜利：移除匪徒；非坏人得 1LP 或 1警官点，坏人得 1LP",
         "失败（平局算败）：受1伤+抽1牌，并移除匪徒"
       ],
       tags: ["匪徒", "被动", "LP", "警官点"]
     },
     {
       section: "警长抓人",
-      title: "👮 警长抓人（被动触发）",
+      title: "警长抓人（被动触发）",
       lines: [
         "玩家胜：警长回警局，玩家无额外损失",
         "玩家败：受1伤+抽1牌，没收牛+半金+半钱，清空通缉点并进警局"
@@ -173,22 +174,23 @@ const DATA = {
   locations: [
     {
       section: "通用",
-      title: "📜 地点共通规则",
+      title: "地点共通规则",
       lines: ["绝大多数地点都可执行“收购”行动，支付费用获取地契牌"],
       tags: ["地契", "收购", "通用"]
     },
     {
       section: "牧场",
-      title: "📍 牧场",
+      title: "牧场",
       lines: [
-        "套牛/长角牛（免费）：拿1牛标记，或弃长角牛获奖励",
-        "偷运（免费）：弃另一颜色的牛，得1通缉点+标记奖励"
+        "套牛：使用 1AP 得 1牛标记 (携带上限为1；携带长角牛时移动力-1)",
+        "运牛：在火车站提交牛标记，得1警官点+标记奖励",
+        "走私：在不同色牧场提交牛标记，得1通缉点+标记奖励"
       ],
-      tags: ["牧场", "牛", "偷运"]
+      tags: ["牧场", "牛", "走私", "通缉"]
     },
     {
       section: "火车站",
-      title: "📍 火车站",
+      title: "火车站",
       lines: [
         "驱赶/长角牛（免费）：弃1牛得1警官点+标记奖励，或弃长角牛获奖励",
         "乘火车旅行：支付$10传送到另一火车站，再继续剩余移动力"
@@ -197,7 +199,7 @@ const DATA = {
     },
     {
       section: "银行",
-      title: "📍 银行",
+      title: "银行",
       lines: [
         "兑现金块：每1金块= $20 + 1 LP",
         "抢劫银行（限1次）：赢则+3通缉点并拿$80；输则+1通缉点、受1伤、抽1牌"
@@ -206,18 +208,18 @@ const DATA = {
     },
     {
       section: "金矿",
-      title: "📍 金矿",
+      title: "金矿",
       lines: [
         "淘金（掷2骰）：",
-        "金块图示=拿1金；$图示=拿$10；$带刷新=拿$10并重掷该骰（除沙砾外）；X=无事发生"
+        "金块=拿1金块；$图示=拿$10；$带刷新=拿$10并重掷该骰；X=只挖到了沙砾，无事发生"
       ],
       tags: ["金矿", "淘金", "骰子"]
     },
     {
       section: "酒馆",
-      title: "📍 酒馆",
+      title: "酒馆",
       lines: [
-        "挑战（扑克）：花$10底注，同城玩家可花$10加入",
+        "挑战（扑克）：花$10底注，同城镇玩家可花$10加入",
         "赢/平：拿$50+所有底注，并得1 LP（或1通缉点），其余参与者抽1牌",
         "输：自己抽1牌"
       ],
@@ -225,25 +227,25 @@ const DATA = {
     },
     {
       section: "杂货店",
-      title: "📍 杂货店",
+      title: "杂货店",
       lines: ["可购买或升级任意数量物品，只要付得起钱"],
       tags: ["杂货店", "购买", "升级"]
     },
     {
       section: "诊所",
-      title: "📍 诊所",
+      title: "诊所",
       lines: ["支付$10治愈全部伤害；每治愈1点伤害抽1张牌"],
       tags: ["诊所", "治疗", "抽牌"]
     },
     {
       section: "舞女酒吧",
-      title: "📍 舞女酒吧",
+      title: "舞女酒吧",
       lines: ["每支付$30获得1 LP，可重复执行"],
       tags: ["舞女酒吧", "LP"]
     },
     {
       section: "火车",
-      title: "📍 火车",
+      title: "火车",
       lines: [
         "抢劫火车（限1次）：抽1张火车遭遇牌并与列车守卫战斗",
         "赢：获得卡牌指示奖励；输：承受失败惩罚并受1伤+抽1牌"
@@ -252,15 +254,31 @@ const DATA = {
     },
     {
       section: "逃犯据点",
-      title: "📍 逃犯据点",
+      title: "逃犯据点",
       lines: ["偷运/长角牛规则与牧场、火车站同类结算"],
       tags: ["逃犯据点", "偷运", "牛"]
     },
     {
       section: "山洞隧道",
-      title: "📍 山洞隧道",
-      lines: ["通谷小径：消耗全部移动力，从一侧瞬移到另一侧，算1次移动行动"],
+      title: "山洞隧道",
+      lines: ["通谷小径：消耗全部移动力，从一侧移动到另一侧，算1次移动行动"],
       tags: ["隧道", "移动"]
+    },
+    {
+      section: "警长办公室",
+      title: "警长办公室",
+      lines: [
+        "玩家被逮捕后会被送至此处，法警玩家也可在此招募帮手"
+      ],
+      tags: ["警长", "法警", "招募", "打工"]
+    },
+    {
+      section: "旅行商人",
+      title: "旅行商人",
+      lines: [
+        "旅行商人会在区域之间移动，提供购买或升级传奇物品、坐骑和武器的机会"
+      ],
+      tags: ["旅行商人", "区域行动", "购买", "升级"]
     }
   ]
 };
@@ -268,10 +286,10 @@ const DATA = {
 const appState = {
   activeTab: "turn",
   activeSub: {
-    turn: "全部",
-    actions: "全部",
-    combat: "全部",
-    locations: "全部"
+    turn: null,
+    actions: null,
+    combat: null,
+    locations: null
   },
   query: ""
 };
@@ -279,10 +297,9 @@ const appState = {
 const tabButtons = Array.from(document.querySelectorAll(".tab-btn"));
 const tabPanels = Array.from(document.querySelectorAll("[data-tab-panel]"));
 const globalSearch = document.getElementById("globalSearch");
-const searchHint = document.getElementById("searchHint");
 
 function uniqSections(items) {
-  return ["全部", ...new Set(items.map((item) => item.section))];
+  return [...new Set(items.map((item) => item.section))];
 }
 
 function cleanTitle(title) {
@@ -293,28 +310,41 @@ function getCardIcon(tab, item) {
   if (tab === "turn") {
     if (item.section === "开始") return "sunrise";
     if (item.section === "行动") return "play";
-    if (item.section === "结束") return "moon";
+    if (item.section === "结束") return "sunset";
     return "clock-3";
   }
 
   if (tab === "actions") {
-    if (item.section === "耗费1AP") return "circle-dot";
+    if (item.section === "耗费1AP") return "hand";
     if (item.section === "免费行动") return "badge-check";
-    if (item.section === "冒险骰") return "dice-3";
+    if (item.section === "冒险骰") return "dices";
     return "zap";
   }
 
   if (tab === "combat") {
-    if (item.section === "逮捕") return "shield";
+    if (item.section === "逮捕") return "columns-4";
     if (item.section === "决斗") return "swords";
     if (item.section === "抢劫") return "hand-coins";
     if (item.section === "打匪徒") return "hat-glasses";
-    if (item.section === "警长抓人") return "shield-alert";
+    if (item.section === "警长抓人") return "siren";
     return "alert-triangle";
   }
 
   if (tab === "locations") {
-    if (item.section === "通用") return "scroll-text";
+    if (item.section === "通用") return "alert-triangle";
+    if (item.section === "牧场") return "carrot";
+    if (item.section === "火车站") return "train-track";
+    if (item.section === "银行") return "badge-dollar-sign";
+    if (item.section === "金矿") return "pickaxe";
+    if (item.section === "酒馆") return "club";
+    if (item.section === "杂货店") return "barrel";
+    if (item.section === "诊所") return "hospital";
+    if (item.section === "舞女酒吧") return "drama";
+    if (item.section === "火车") return "train";
+    if (item.section === "逃犯据点") return "flame-kindling";
+    if (item.section === "山洞隧道") return "rail-symbol";
+    if (item.section === "警长办公室") return "square-star";
+    if (item.section === "旅行商人") return "baggage-claim";
     return "map-pin";
   }
 
@@ -412,7 +442,7 @@ function renderTabContent(tab) {
   const query = appState.query.trim().toLowerCase();
 
   let items = DATA[tab];
-  if (sectionFilter && sectionFilter !== "全部") {
+  if (sectionFilter) {
     items = items.filter((item) => item.section === sectionFilter);
   }
   if (query) {
@@ -453,9 +483,6 @@ tabButtons.forEach((btn) => {
 
 globalSearch.addEventListener("input", (event) => {
   appState.query = event.target.value;
-  searchHint.textContent = appState.query
-    ? `关键词：${appState.query}（仅筛选当前一级菜单）`
-    : "默认显示当前菜单全部内容";
 
   if (DATA[appState.activeTab]) {
     renderTabContent(appState.activeTab);

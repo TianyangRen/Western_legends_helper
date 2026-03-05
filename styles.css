@@ -1,33 +1,39 @@
 :root {
-  --bg: #0b1220;
-  --bg-2: #0f1a2e;
-  --panel: #121d33;
-  --panel-2: #182744;
-  --text: #f3f7ff;
-  --muted: #a8b8d8;
-  --accent: #57a2ff;
-  --accent-2: #7db9ff;
-  --accent-soft: rgba(87, 162, 255, 0.16);
-  --border: rgba(140, 177, 235, 0.3);
-  --danger: #ff9a9a;
-  --ok: #8ae8be;
+  --bg: #0a090c;
+  --bg-2: #171310;
+  --panel: #211a16;
+  --panel-2: #15110e;
+  --text: #faf2db;
+  --muted: #bcae95;
+  --accent: #faf2db;
+  --accent-2: #b8925f;
+  --accent-soft: rgba(184, 146, 95, 0.16);
+  --border: rgba(184, 146, 95, 0.45);
+  --danger: #ffb2a8;
+  --ok: #c8f1c3;
   --radius: 16px;
-  --shadow: 0 10px 28px rgba(1, 8, 21, 0.35);
+  --shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
   margin: 0;
-  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  background:
-    radial-gradient(1200px 600px at 20% -10%, #1f3f73 0%, transparent 50%),
-    radial-gradient(1000px 500px at 100% 0%, #1d3155 0%, transparent 45%),
-    linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", "Segoe UI", sans-serif;
+  background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
   color: var(--text);
   min-height: 100vh;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 .app-header {
@@ -55,13 +61,12 @@ body {
 }
 
 .card {
-  background: linear-gradient(180deg, rgba(31, 47, 77, 0.65) 0%, rgba(17, 28, 49, 0.82) 100%);
+  background: var(--panel);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 14px;
   margin-bottom: 12px;
   box-shadow: var(--shadow);
-  backdrop-filter: blur(3px);
 }
 
 .label {
@@ -76,7 +81,7 @@ button {
   width: 100%;
   border-radius: 12px;
   border: 1px solid var(--border);
-  background: #10203a;
+  background: var(--panel-2);
   color: var(--text);
   padding: 11px 12px;
   font-size: 0.96rem;
@@ -93,6 +98,15 @@ button:focus-visible {
 
 button {
   cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  touch-action: manipulation;
+}
+
+button:active,
+.chip:active,
+.tab-btn:active {
+  outline: none;
 }
 
 .hint {
@@ -113,14 +127,14 @@ button {
   width: 100%;
   padding: 9px 14px;
   font-weight: 600;
-  background: #152643;
-  color: #dceaff;
+  background: var(--panel-2);
+  color: var(--text);
 }
 
 .tab-btn.active {
   border-color: var(--accent-2);
-  background: linear-gradient(135deg, #22508a, #2f6cb4);
-  color: #fff;
+  background: var(--accent-2);
+  color: #1c1713;
 }
 
 .tab-panel {
@@ -147,7 +161,7 @@ button {
 .rule-title i {
   width: 18px;
   height: 18px;
-  color: var(--accent-2);
+  color: var(--accent);
   flex: 0 0 auto;
 }
 
@@ -163,12 +177,13 @@ button {
   width: 100%;
   padding: 7px 11px;
   font-size: 0.88rem;
-  background: #162841;
+  background: var(--panel-2);
 }
 
 .chip.active {
-  background: #27558f;
+  background: var(--accent-2);
   border-color: var(--accent-2);
+  color: #1c1713;
 }
 
 .content-list {
@@ -177,22 +192,22 @@ button {
 }
 
 .rule-card {
-  background: linear-gradient(180deg, rgba(30, 46, 76, 0.74) 0%, rgba(19, 32, 55, 0.9) 100%);
-  border: 1px solid rgba(150, 182, 234, 0.24);
+  background: var(--panel);
+  border: 1px solid rgba(200, 162, 106, 0.35);
   border-radius: 14px;
   padding: 13px;
-  box-shadow: 0 6px 18px rgba(2, 10, 24, 0.24);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
 }
 
 .rule-card h3 {
   margin: 0 0 8px;
   font-size: 1rem;
-  color: #f6f9ff;
+  color: var(--text);
 }
 
 .rule-card p {
   margin: 6px 0;
-  color: #deebff;
+  color: var(--text);
   line-height: 1.45;
 }
 
@@ -216,8 +231,8 @@ button {
   height: 18px;
   border-radius: 999px;
   border: 1px solid var(--accent-2);
-  color: #eaf3ff;
-  background: rgba(87, 162, 255, 0.22);
+  color: var(--bg);
+  background: var(--accent-2);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -241,9 +256,9 @@ button {
 
 .tag {
   font-size: 0.75rem;
-  color: #d4e8ff;
-  border: 1px solid rgba(143, 183, 241, 0.52);
-  background: rgba(94, 145, 216, 0.14);
+  color: var(--text);
+  border: 1px solid rgba(208, 168, 111, 0.78);
+  background: rgba(208, 168, 111, 0.15);
   border-radius: 999px;
   padding: 4px 9px;
 }
