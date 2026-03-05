@@ -298,6 +298,10 @@ input:focus-visible {
 
 .fishing-modal {
   width: min(1320px, 99vw);
+  background-image: url("Expansions/back.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
 }
 
 .modal-head {
