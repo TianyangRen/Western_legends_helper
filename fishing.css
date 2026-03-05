@@ -165,6 +165,21 @@ body {
   font-weight: 700;
 }
 
+.launch-btn,
+.ghost-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.42em;
+}
+
+.launch-btn svg,
+.ghost-btn svg {
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+}
+
 .ghost-btn {
   background: var(--panel-2);
   color: var(--text-main);
@@ -241,10 +256,16 @@ input:focus-visible {
   margin-top: 4px;
 }
 
-.player-chip small i {
-  width: 14px;
-  height: 14px;
-  vertical-align: -2px;
+.player-chip .chip-fish-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.player-chip .chip-fish-count svg {
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
 }
 
 .pos-left-top { left: 10px; top: 12%; }
@@ -446,6 +467,35 @@ select {
   border-radius: 10px;
   padding: 8px;
   background: var(--panel-2);
+}
+
+.suit-icon-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.suit-icon-chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-2);
+  color: var(--text-main);
+  min-height: 36px;
+  padding: 6px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.suit-icon-chip svg {
+  width: 1em;
+  height: 1em;
+}
+
+.suit-icon-chip.active {
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .creel-choice-grid {

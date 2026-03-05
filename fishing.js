@@ -322,7 +322,7 @@ function renderDock() {
     chip.className = `player-chip ${DOCK_POSITIONS[index] || DOCK_POSITIONS[DOCK_POSITIONS.length - 1]}`;
     chip.style.background = chipColor;
     chip.style.color = color.text;
-    chip.innerHTML = `<span>${player.name}</span><small>点数 ${totals.might} | $${totals.money} | <i data-lucide="fish" aria-hidden="true"></i> ${player.creel.length}/5</small>`;
+    chip.innerHTML = `<span>${player.name}</span><small>点数 ${totals.might} | $${totals.money} | <span class="chip-fish-count"><i data-lucide="fish" aria-hidden="true"></i>${player.creel.length}/5</span></small>`;
 
     chip.addEventListener("click", () => {
       state.runtime.selectedPlayerId = player.playerId;
@@ -547,6 +547,7 @@ function renderSteelingStep(action) {
 
   const pokerRowEl = document.getElementById("singlePokerRow");
   const pokerSummaryEl = document.getElementById("pokerSummary");
+  const suitSelectEl = pokerRowEl.querySelector(".poker-suit");
 
   const updatePokerSummary = () => {
     const parsed = parseSinglePokerCard(pokerRowEl);
@@ -557,9 +558,22 @@ function renderSteelingStep(action) {
     select.addEventListener("change", updatePokerSummary);
   });
 
+  suitSelectEl.addEventListener("change", () => {
+    syncSuitIconSelection(suitSelectEl.value);
+  });
+
+  dom.fishingContent.querySelectorAll("[data-suit-option]").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      suitSelectEl.value = chip.dataset.suitOption;
+      updatePokerSummary();
+      syncSuitIconSelection(suitSelectEl.value);
+    });
+  });
+
   bindHighlightSelection(".steeling-fish", ".creel-choice");
 
   updatePokerSummary();
+  syncSuitIconSelection(suitSelectEl.value);
 
   const confirmBtn = document.getElementById("confirmSteelingBtn");
   confirmBtn.addEventListener("click", () => {
@@ -590,10 +604,10 @@ function renderSteelingStep(action) {
 function renderPokerCardInput(selectedRank, selectedSuit) {
   const ranks = ["", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
   const suits = [
-    { id: "spades", label: "黑桃 spade" },
-    { id: "clubs", label: "梅花 club" },
-    { id: "hearts", label: "红桃 heart" },
-    { id: "diamonds", label: "方块 diamond" }
+    { id: "spades", label: "黑桃", icon: "spade" },
+    { id: "clubs", label: "梅花", icon: "club" },
+    { id: "hearts", label: "红桃", icon: "heart" },
+    { id: "diamonds", label: "方块", icon: "diamond" }
   ];
 
   const rankOptions = ranks
@@ -611,12 +625,26 @@ function renderPokerCardInput(selectedRank, selectedSuit) {
     })
     .join("");
 
+  const suitChips = suits
+    .map((suit) => {
+      const active = suit.id === selectedSuit ? "active" : "";
+      return `<button class="suit-icon-chip ${active}" type="button" data-suit-option="${suit.id}"><i data-lucide="${suit.icon}" aria-hidden="true"></i>${suit.label}</button>`;
+    })
+    .join("");
+
   return `
     <div id="singlePokerRow" class="poker-card-row">
       <select class="poker-rank">${rankOptions}</select>
       <select class="poker-suit">${suitOptions}</select>
     </div>
+    <div class="suit-icon-row">${suitChips}</div>
   `;
+}
+
+function syncSuitIconSelection(selectedSuit) {
+  document.querySelectorAll(".suit-icon-chip").forEach((chip) => {
+    chip.classList.toggle("active", chip.dataset.suitOption === selectedSuit);
+  });
 }
 
 function parseSinglePokerCard(container) {
