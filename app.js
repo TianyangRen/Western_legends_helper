@@ -320,6 +320,36 @@ function cleanTitle(title) {
   return title.replace(/^[^\p{L}\p{N}]+/u, "").trim();
 }
 
+function escapeRegExp(text) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function setHighlightedText(element, text, query) {
+  const value = String(text);
+  const keyword = query.trim();
+
+  element.textContent = "";
+  if (!keyword) {
+    element.textContent = value;
+    return;
+  }
+
+  const matcher = new RegExp(`(${escapeRegExp(keyword)})`, "ig");
+  const chunks = value.split(matcher);
+
+  chunks.forEach((chunk) => {
+    if (!chunk) return;
+    if (chunk.toLowerCase() === keyword.toLowerCase()) {
+      const mark = document.createElement("mark");
+      mark.className = "kw-highlight";
+      mark.textContent = chunk;
+      element.appendChild(mark);
+      return;
+    }
+    element.appendChild(document.createTextNode(chunk));
+  });
+}
+
 function getCardIcon(tab, item) {
   if (tab === "turn") {
     if (item.section === "开始") return "sunrise";
@@ -372,7 +402,7 @@ function refreshLucideIcons() {
   }
 }
 
-function createRuleCard(item, tab) {
+function createRuleCard(item, tab, query) {
   const card = document.createElement("article");
   card.className = "rule-card";
 
@@ -383,7 +413,7 @@ function createRuleCard(item, tab) {
   icon.setAttribute("data-lucide", getCardIcon(tab, item));
 
   const text = document.createElement("span");
-  text.textContent = cleanTitle(item.title);
+  setHighlightedText(text, cleanTitle(item.title), query);
 
   title.appendChild(icon);
   title.appendChild(text);
@@ -399,7 +429,7 @@ function createRuleCard(item, tab) {
       lineIcon.textContent = `${index + 1}`;
 
       const lineText = document.createElement("p");
-      lineText.textContent = line;
+      setHighlightedText(lineText, line, query);
 
       lineRow.appendChild(lineIcon);
       lineRow.appendChild(lineText);
@@ -408,25 +438,15 @@ function createRuleCard(item, tab) {
     }
 
     const p = document.createElement("p");
-    p.textContent = `• ${line}`;
+    setHighlightedText(p, `• ${line}`, query);
     card.appendChild(p);
   });
-
-  const tagRow = document.createElement("div");
-  tagRow.className = "tag-row";
-  item.tags.forEach((tag) => {
-    const span = document.createElement("span");
-    span.className = "tag";
-    span.textContent = tag;
-    tagRow.appendChild(span);
-  });
-  card.appendChild(tagRow);
 
   return card;
 }
 
 function textForSearch(item) {
-  return [item.section, item.title, ...item.lines, ...item.tags].join(" ").toLowerCase();
+  return [item.title, ...item.lines].join(" ").toLowerCase();
 }
 
 function renderSubNav(tab) {
@@ -454,7 +474,8 @@ function renderTabContent(tab) {
   if (!holder) return;
 
   const sectionFilter = appState.activeSub[tab];
-  const query = appState.query.trim().toLowerCase();
+  const rawQuery = appState.query.trim();
+  const query = rawQuery.toLowerCase();
 
   let items = DATA[tab];
   if (sectionFilter) {
@@ -473,7 +494,7 @@ function renderTabContent(tab) {
     return;
   }
 
-  items.forEach((item) => holder.appendChild(createRuleCard(item, tab)));
+  items.forEach((item) => holder.appendChild(createRuleCard(item, tab, rawQuery)));
   refreshLucideIcons();
 }
 
