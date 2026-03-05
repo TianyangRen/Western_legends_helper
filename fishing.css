@@ -76,9 +76,12 @@ body {
 .hub-stage::after {
   content: "";
   position: absolute;
-  inset: -18%;
+  width: 160%;
+  height: 160%;
+  left: 50%;
+  top: 50%;
   background: url("Expansions/Fishing_v5/back.jpg") center / cover no-repeat;
-  transform: rotate(90deg) scale(1.16);
+  transform: translate(-50%, -50%) rotate(90deg) scale(1.24);
   opacity: 0.12;
   pointer-events: none;
   z-index: 0;
