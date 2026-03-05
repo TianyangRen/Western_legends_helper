@@ -47,6 +47,10 @@ textarea {
   padding: 22px 16px 12px;
   max-width: 960px;
   margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .app-header h1 {
@@ -55,6 +59,35 @@ textarea {
   letter-spacing: 0.2px;
   font-family: "Ewert", serif;
   font-weight: 400;
+}
+
+.header-icon-link {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.header-icon-link i {
+  width: 19px;
+  height: 19px;
+}
+
+.header-icon-link:hover {
+  transform: translateY(-1px);
+}
+
+.header-icon-link:focus-visible {
+  outline: none;
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .subtitle {

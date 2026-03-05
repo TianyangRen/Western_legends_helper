@@ -1,0 +1,563 @@
+﻿:root {
+  --bg: #0a090c;
+  --bg-2: #171310;
+  --panel: #211a16;
+  --panel-2: #15110e;
+  --text-main: #faf2db;
+  --text-dim: #bcae95;
+  --accent: #faf2db;
+  --accent-2: #b8925f;
+  --accent-soft: rgba(184, 146, 95, 0.16);
+  --line: rgba(184, 146, 95, 0.45);
+  --danger: #ffb2a8;
+  --ok: #c8f1c3;
+  --shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+  color: var(--text-main);
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", "Segoe UI", sans-serif;
+}
+
+.fishing-app {
+  min-height: 100vh;
+  padding: 14px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.brand h1 {
+  margin: 0;
+  font-family: "Ewert", serif;
+  letter-spacing: 0.2px;
+  font-size: clamp(1.15rem, 2.7vw, 1.85rem);
+  font-weight: 400;
+}
+
+.brand-sub {
+  margin: 0 0 6px;
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 1.6px;
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.hub-stage {
+  position: relative;
+  min-height: calc(100vh - 110px);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(10, 9, 12, 0.86), rgba(23, 19, 16, 0.82));
+  overflow: hidden;
+}
+
+.hub-stage::after {
+  content: "";
+  position: absolute;
+  inset: -18%;
+  background: url("Expansions/Fishing_v5/back.jpg") center / cover no-repeat;
+  transform: rotate(90deg) scale(1.16);
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hub-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.28));
+}
+
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.center-hub {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  width: min(92vw, 620px);
+  padding: 18px;
+  display: grid;
+  gap: 14px;
+  z-index: 2;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.stat-card {
+  margin: 0;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+}
+
+.stat-card h2 {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+.stat-card p {
+  margin: 8px 0 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.hub-status {
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  color: var(--text-dim);
+  min-height: 42px;
+}
+
+.launch-btn,
+.ghost-btn,
+.icon-btn {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  min-height: 44px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.launch-btn {
+  background: var(--accent-2);
+  color: #1c1713;
+  font-weight: 700;
+}
+
+.ghost-btn {
+  background: var(--panel-2);
+  color: var(--text-main);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ghost-btn.danger {
+  border-color: rgba(255, 178, 168, 0.55);
+  color: #ffd6d6;
+}
+
+.icon-btn {
+  width: 44px;
+  min-width: 44px;
+  padding: 0;
+  font-size: 1.4rem;
+  color: var(--text-main);
+  background: var(--panel-2);
+}
+
+.launch-btn:hover,
+.ghost-btn:hover,
+.icon-btn:hover {
+  transform: translateY(-1px);
+}
+
+.launch-btn:focus-visible,
+.ghost-btn:focus-visible,
+.icon-btn:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: none;
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.launch-btn:disabled,
+.ghost-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.player-dock {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.player-chip {
+  position: absolute;
+  pointer-events: auto;
+  min-width: 190px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: #fff;
+  padding: 12px 16px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: left;
+  box-shadow: var(--shadow);
+}
+
+.player-chip small {
+  display: block;
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 500;
+  font-size: 0.86rem;
+  margin-top: 4px;
+}
+
+.pos-left-top { left: 10px; top: 12%; }
+.pos-left-mid { left: 10px; top: 42%; }
+.pos-right-top { right: 10px; top: 12%; }
+.pos-right-mid { right: 10px; top: 42%; }
+.pos-bottom-left { left: 20%; bottom: 10px; }
+.pos-bottom-right { right: 20%; bottom: 10px; }
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 9, 12, 0.78);
+  display: grid;
+  place-items: center;
+  padding: 14px;
+  z-index: 20;
+}
+
+.hidden {
+  display: none;
+}
+
+.modal {
+  width: min(1120px, 98vw);
+  max-height: 95vh;
+  overflow: auto;
+  padding: 16px;
+}
+
+.fishing-modal {
+  width: min(1320px, 99vw);
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.modal-head h2 {
+  margin: 0;
+  letter-spacing: 0.2px;
+  font-size: 1.1rem;
+}
+
+.form-row {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+select {
+  min-height: 44px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--text-main);
+  padding: 8px 10px;
+}
+
+.seat-title {
+  margin: 0 0 8px;
+  color: var(--text-dim);
+}
+
+.seat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+}
+
+.seat-slot {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  background: var(--panel-2);
+}
+
+.seat-slot label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.92rem;
+}
+
+.modal-actions {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.player-panel-body {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.panel-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 8px;
+  background: var(--panel-2);
+}
+
+.panel-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+  background: #070604;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
+
+.fishing-content .panel-card img {
+  height: min(46vh, 380px);
+}
+
+.creeling-scroll-list {
+  display: grid;
+  gap: 10px;
+  max-height: min(62vh, 560px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.creeling-item {
+  margin: 0;
+}
+
+.panel-card h3 {
+  margin: 8px 0 4px;
+  font-size: 1rem;
+}
+
+.panel-card p {
+  margin: 0 0 8px;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+.fishing-content {
+  display: grid;
+  gap: 12px;
+}
+
+.step-block {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  background: var(--panel-2);
+}
+
+.step-block h3 {
+  margin: 0 0 8px;
+}
+
+.player-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.player-btn {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 10px 14px;
+  color: #fff;
+  background: var(--panel-2);
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.poker-rows {
+  display: grid;
+  gap: 8px;
+}
+
+.poker-card-row {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) minmax(160px, 1fr);
+  gap: 8px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px;
+  background: var(--panel-2);
+}
+
+.creel-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+.creel-choice {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px;
+  background: var(--panel-2);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.creel-choice img {
+  width: 140px;
+  height: 96px;
+  object-fit: contain;
+  background: #070604;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+}
+
+.reveal-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.flip-card {
+  perspective: 900px;
+  min-height: 96px;
+}
+
+.flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.55s ease;
+  transform-style: preserve-3d;
+}
+
+.flip-card.revealed .flip-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  backface-visibility: hidden;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #070604;
+}
+
+.flip-face img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.flip-back img {
+  transform: rotate(90deg) scale(1.22);
+  transform-origin: center;
+}
+
+.flip-front {
+  transform: rotateY(180deg);
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.notice {
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(184, 146, 95, 0.12);
+  color: var(--text-main);
+  padding: 9px;
+}
+
+.notice.warn {
+  border-color: rgba(255, 178, 168, 0.55);
+  background: rgba(128, 43, 33, 0.18);
+  color: #ffe4df;
+}
+
+@media (max-width: 980px) {
+  .center-hub {
+    width: calc(100% - 20px);
+  }
+
+  .pos-left-top,
+  .pos-left-mid,
+  .pos-right-top,
+  .pos-right-mid {
+    top: auto;
+    bottom: 70px;
+  }
+
+  .pos-left-top { left: 8px; }
+  .pos-left-mid { left: 150px; }
+  .pos-right-top { right: 150px; }
+  .pos-right-mid { right: 8px; }
+
+  .pos-bottom-left { left: 8px; bottom: 10px; }
+  .pos-bottom-right { right: 8px; bottom: 10px; }
+
+  .player-chip {
+    min-width: 168px;
+    padding: 10px 12px;
+    font-size: 0.92rem;
+  }
+
+  .player-chip small {
+    font-size: 0.8rem;
+  }
+
+  .poker-card-row {
+    grid-template-columns: 1fr;
+  }
+
+  .fishing-modal {
+    width: 99vw;
+  }
+}

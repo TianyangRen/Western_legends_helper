@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, viewport-fit=cover" />
+  <title>Western Legends - Fishing Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Ewert&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="fishing.css" />
+</head>
+<body>
+  <div class="fishing-app" id="fishingApp">
+    <header class="topbar">
+      <div class="brand">
+        <p class="brand-sub">Western Legends</p>
+        <h1>Fishing Public Console</h1>
+      </div>
+      <div class="topbar-actions">
+        <a class="ghost-btn" href="index.html">返回规则页</a>
+        <button id="openSetupBtn" class="ghost-btn" type="button">设置/重开</button>
+      </div>
+    </header>
+
+    <main class="hub-stage">
+      <section class="center-hub panel">
+        <div class="stats-row">
+          <article class="stat-card">
+            <h2>公共牌堆</h2>
+            <p><span id="drawCount">0</span> 张</p>
+          </article>
+          <article class="stat-card">
+            <h2>弃牌堆</h2>
+            <p><span id="discardCount">0</span> 张</p>
+          </article>
+        </div>
+
+        <div id="hubStatus" class="hub-status">请先进入设置并生成鱼池。</div>
+
+        <button id="startFishingBtn" class="launch-btn" type="button">🎣 发起钓鱼行动</button>
+      </section>
+
+      <aside id="playerDock" class="player-dock" aria-label="玩家页签"></aside>
+    </main>
+  </div>
+
+  <div id="setupOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
+    <section class="modal panel setup-modal">
+      <header class="modal-head">
+        <h2 id="setupTitle">启动与设置</h2>
+        <button id="closeSetupBtn" class="icon-btn" type="button" aria-label="关闭设置">×</button>
+      </header>
+
+      <div class="form-row">
+        <label for="playerCount">选择人数</label>
+        <select id="playerCount"></select>
+      </div>
+
+      <div>
+        <p class="seat-title">分配颜色（不可重复）</p>
+        <div id="seatSlots" class="seat-grid"></div>
+      </div>
+
+      <footer class="modal-actions">
+        <button id="resetStorageBtn" class="ghost-btn danger" type="button">清空本地对局</button>
+        <button id="generateGameBtn" class="launch-btn" type="button">生成公共鱼池并开始</button>
+      </footer>
+    </section>
+  </div>
+
+  <div id="playerOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="playerPanelTitle">
+    <section class="modal panel player-modal">
+      <header class="modal-head">
+        <h2 id="playerPanelTitle">玩家鱼篓</h2>
+        <button id="closePlayerPanelBtn" class="icon-btn" type="button" aria-label="关闭玩家面板">×</button>
+      </header>
+
+      <div id="playerPanelBody" class="player-panel-body"></div>
+
+      <footer class="modal-actions">
+        <button id="discardSelectedBtn" class="ghost-btn" type="button">丢弃所选</button>
+        <button id="sellSelectedBtn" class="launch-btn" type="button">💰 在牧场出售所选</button>
+      </footer>
+    </section>
+  </div>
+
+  <div id="fishingOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="fishingFlowTitle">
+    <section class="modal panel fishing-modal">
+      <header class="modal-head">
+        <h2 id="fishingFlowTitle">钓鱼行动流</h2>
+        <button id="closeFishingBtn" class="icon-btn" type="button" aria-label="关闭钓鱼行动">×</button>
+      </header>
+
+      <div id="fishingContent" class="fishing-content"></div>
+    </section>
+  </div>
+
+  <template id="cardTileTemplate">
+    <article class="card-tile">
+      <img alt="fish card" />
+      <div class="card-meta"></div>
+    </article>
+  </template>
+
+  <script src="fishing.js" type="module"></script>
+</body>
+</html>
