@@ -218,12 +218,12 @@ input:focus-visible {
 .player-chip {
   position: absolute;
   pointer-events: auto;
-  min-width: 190px;
+  min-width: 152px;
   border-radius: 999px;
   border: 1px solid var(--line);
   background: var(--panel-2);
   color: #fff;
-  padding: 12px 16px;
+  padding: 12px 12px;
   font-size: 1rem;
   font-weight: 700;
   text-align: left;
@@ -240,10 +240,10 @@ input:focus-visible {
 
 .pos-left-top { left: 10px; top: 12%; }
 .pos-left-mid { left: 10px; top: 42%; }
+.pos-left-bottom { left: 10px; top: 72%; }
 .pos-right-top { right: 10px; top: 12%; }
 .pos-right-mid { right: 10px; top: 42%; }
-.pos-bottom-left { left: 20%; bottom: 10px; }
-.pos-bottom-right { right: 20%; bottom: 10px; }
+.pos-right-bottom { right: 10px; top: 72%; }
 
 .overlay {
   position: fixed;
@@ -444,6 +444,18 @@ select {
   align-items: center;
 }
 
+.overflow-choice {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.overflow-choice.selected {
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  background: rgba(184, 146, 95, 0.18);
+}
+
 .creel-choice img {
   width: 140px;
   height: 96px;
@@ -527,24 +539,15 @@ select {
     width: calc(100% - 20px);
   }
 
-  .pos-left-top,
-  .pos-left-mid,
-  .pos-right-top,
-  .pos-right-mid {
-    top: auto;
-    bottom: 70px;
-  }
-
-  .pos-left-top { left: 8px; }
-  .pos-left-mid { left: 150px; }
-  .pos-right-top { right: 150px; }
-  .pos-right-mid { right: 8px; }
-
-  .pos-bottom-left { left: 8px; bottom: 10px; }
-  .pos-bottom-right { right: 8px; bottom: 10px; }
+  .pos-left-top { left: 8px; top: 10%; }
+  .pos-left-mid { left: 8px; top: 38%; }
+  .pos-left-bottom { left: 8px; top: 66%; }
+  .pos-right-top { right: 8px; top: 10%; }
+  .pos-right-mid { right: 8px; top: 38%; }
+  .pos-right-bottom { right: 8px; top: 66%; }
 
   .player-chip {
-    min-width: 168px;
+    min-width: 136px;
     padding: 10px 12px;
     font-size: 0.92rem;
   }

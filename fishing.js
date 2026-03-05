@@ -14,10 +14,10 @@ const PLAYER_COLORS = [
 const DOCK_POSITIONS = [
   "pos-left-top",
   "pos-left-mid",
+  "pos-left-bottom",
   "pos-right-top",
   "pos-right-mid",
-  "pos-bottom-left",
-  "pos-bottom-right"
+  "pos-right-bottom"
 ];
 
 const dom = {};
@@ -497,7 +497,8 @@ function startSteeling(playerId) {
     drawnIds: [],
     pendingFishIds: [],
     currentFishIndex: 0,
-    exactMatch: false
+    exactMatch: false,
+    creelingSummary: getEmptyCreelingSummary()
   };
 
   setHubMessage(`已开始 ${getPlayerById(playerId)?.name || "玩家"} 的钓鱼行动。`);
@@ -723,6 +724,10 @@ async function runReelingSequence() {
 function renderCreelingStep(action) {
   const player = getPlayerById(action.playerId);
 
+  if (!action.creelingSummary) {
+    action.creelingSummary = getEmptyCreelingSummary();
+  }
+
   if (player.creel.length > 5) {
     renderOverflowStep(player);
     return;
@@ -730,10 +735,31 @@ function renderCreelingStep(action) {
 
   const remaining = action.pendingFishIds.length;
   if (remaining <= 0) {
+    const summary = action.creelingSummary;
     dom.fishingContent.innerHTML = `
       <section class="step-block">
         <h3>Step 4: 入篓结算完成</h3>
         <p>本次钓鱼行动已处理完毕。</p>
+        <div class="creel-choice-grid">
+          <article class="panel-card">
+            <h3>保留</h3>
+            <p>张数 ${summary.keep.count}</p>
+            <p>点数合计 ${summary.keep.might}</p>
+            <p>价格合计 $${summary.keep.price}</p>
+          </article>
+          <article class="panel-card">
+            <h3>丢弃</h3>
+            <p>张数 ${summary.cull.count}</p>
+            <p>点数合计 ${summary.cull.might}</p>
+            <p>价格合计 $${summary.cull.price}</p>
+          </article>
+          <article class="panel-card">
+            <h3>食用</h3>
+            <p>张数 ${summary.consume.count}</p>
+            <p>点数合计 ${summary.consume.might}</p>
+            <p>价格合计 $${summary.consume.price}</p>
+          </article>
+        </div>
         <div class="modal-actions">
           <button id="finishFishingTurnBtn" class="launch-btn" type="button">结束回合并返回主控制台</button>
         </div>
@@ -786,6 +812,15 @@ function resolveCreelingChoice(action, player, cardId, choice) {
 
   if (!action.pendingFishIds.includes(cardId)) return;
 
+  if (!action.creelingSummary) {
+    action.creelingSummary = getEmptyCreelingSummary();
+  }
+
+  const summaryType = choice === "keep" ? "keep" : choice === "consume" ? "consume" : "cull";
+  action.creelingSummary[summaryType].count += 1;
+  action.creelingSummary[summaryType].might += Number(card.might || 0);
+  action.creelingSummary[summaryType].price += Number(card.price || 0);
+
   if (choice === "keep") {
     player.creel.push(cardId);
     setHubMessage(`${player.name} 保留了 ${card.name}。`);
@@ -810,11 +845,10 @@ function renderOverflowStep(player) {
     .map((cardId) => {
       const card = getCard(cardId);
       return `
-        <label class="creel-choice">
+        <button class="creel-choice overflow-choice" data-card-id="${card.id}" type="button">
           <img src="${card.image}" alt="${card.name}" />
           <span>${card.name}</span>
-          <input type="checkbox" class="overflow-check" value="${card.id}" />
-        </label>
+        </button>
       `;
     })
     .join("");
@@ -823,6 +857,7 @@ function renderOverflowStep(player) {
     <section class="step-block">
       <h3>鱼篓超上限警告</h3>
       <p class="notice warn">${player.name} 当前鱼篓 ${player.creel.length}/5，请至少丢弃 ${overflowCount} 张后才能继续。</p>
+      <p id="overflowSelectionHint" class="notice">当前已选择：0 张</p>
       <div class="creel-choice-grid">${options}</div>
       <div class="modal-actions">
         <button id="resolveOverflowBtn" class="launch-btn" type="button">丢弃所选并继续</button>
@@ -830,8 +865,28 @@ function renderOverflowStep(player) {
     </section>
   `;
 
+  const overflowChoices = Array.from(dom.fishingContent.querySelectorAll(".overflow-choice"));
+  const overflowSelectionHint = document.getElementById("overflowSelectionHint");
+
+  const updateOverflowSelectionHint = () => {
+    const count = overflowChoices.filter((choice) => choice.classList.contains("selected")).length;
+    overflowSelectionHint.textContent = `当前已选择：${count} 张`;
+  };
+
+  overflowChoices.forEach((choice) => {
+    choice.addEventListener("click", () => {
+      choice.classList.toggle("selected");
+      updateOverflowSelectionHint();
+    });
+  });
+
+  updateOverflowSelectionHint();
+
   document.getElementById("resolveOverflowBtn").addEventListener("click", () => {
-    const selected = getCheckedValues(".overflow-check");
+    const selected = overflowChoices
+      .filter((choice) => choice.classList.contains("selected"))
+      .map((choice) => choice.dataset.cardId);
+
     if (selected.length < overflowCount) {
       setHubMessage(`请至少选择 ${overflowCount} 张进行丢弃。`);
       renderHub();
@@ -917,6 +972,14 @@ function getPlayerCreelTotals(player) {
     },
     { might: 0, money: 0 }
   );
+}
+
+function getEmptyCreelingSummary() {
+  return {
+    keep: { count: 0, might: 0, price: 0 },
+    cull: { count: 0, might: 0, price: 0 },
+    consume: { count: 0, might: 0, price: 0 }
+  };
 }
 
 function getCard(cardId) {
