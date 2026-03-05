@@ -525,6 +525,13 @@ globalSearch.addEventListener("input", (event) => {
   }
 });
 
+globalSearch.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    globalSearch.blur();
+  }
+});
+
 Object.keys(DATA).forEach((tab) => {
   renderSubNav(tab);
   renderTabContent(tab);
