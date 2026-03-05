@@ -446,6 +446,7 @@ function closeFishingFlow() {
 function renderFishingFlow() {
   const action = state.game.action;
   if (!action) {
+    dom.fishingOverlay.querySelector(".fishing-modal").style.borderColor = "";
     renderFishingIdentityStep();
     return;
   }
@@ -468,6 +469,7 @@ function renderFishingFlow() {
 
 function renderFishingIdentityStep() {
   dom.fishingFlowTitle.textContent = "钓鱼行动流";
+  dom.fishingOverlay.querySelector(".fishing-modal").style.borderColor = "";
 
   const buttons = state.game.players
     .map((player) => {
@@ -547,33 +549,27 @@ function renderSteelingStep(action) {
 
   const pokerRowEl = document.getElementById("singlePokerRow");
   const pokerSummaryEl = document.getElementById("pokerSummary");
-  const suitSelectEl = pokerRowEl.querySelector(".poker-suit");
 
   const updatePokerSummary = () => {
     const parsed = parseSinglePokerCard(pokerRowEl);
     pokerSummaryEl.textContent = `当前扑克牌点数：${parsed.value}`;
   };
 
-  pokerRowEl.querySelectorAll(".poker-rank, .poker-suit").forEach((select) => {
+  pokerRowEl.querySelectorAll(".poker-rank").forEach((select) => {
     select.addEventListener("change", updatePokerSummary);
-  });
-
-  suitSelectEl.addEventListener("change", () => {
-    syncSuitIconSelection(suitSelectEl.value);
   });
 
   dom.fishingContent.querySelectorAll("[data-suit-option]").forEach((chip) => {
     chip.addEventListener("click", () => {
-      suitSelectEl.value = chip.dataset.suitOption;
+      syncSuitIconSelection(chip.dataset.suitOption);
       updatePokerSummary();
-      syncSuitIconSelection(suitSelectEl.value);
     });
   });
 
   bindHighlightSelection(".steeling-fish", ".creel-choice");
 
   updatePokerSummary();
-  syncSuitIconSelection(suitSelectEl.value);
+  syncSuitIconSelection(selectedSuit);
 
   const confirmBtn = document.getElementById("confirmSteelingBtn");
   confirmBtn.addEventListener("click", () => {
@@ -618,13 +614,6 @@ function renderPokerCardInput(selectedRank, selectedSuit) {
     })
     .join("");
 
-  const suitOptions = suits
-    .map((suit) => {
-      const selected = suit.id === selectedSuit ? "selected" : "";
-      return `<option value="${suit.id}" ${selected}>${suit.label}</option>`;
-    })
-    .join("");
-
   const suitChips = suits
     .map((suit) => {
       const active = suit.id === selectedSuit ? "active" : "";
@@ -635,9 +624,8 @@ function renderPokerCardInput(selectedRank, selectedSuit) {
   return `
     <div id="singlePokerRow" class="poker-card-row">
       <select class="poker-rank">${rankOptions}</select>
-      <select class="poker-suit">${suitOptions}</select>
+      <div class="suit-icon-row">${suitChips}</div>
     </div>
-    <div class="suit-icon-row">${suitChips}</div>
   `;
 }
 
@@ -649,7 +637,10 @@ function syncSuitIconSelection(selectedSuit) {
 
 function parseSinglePokerCard(container) {
   const rank = container.querySelector(".poker-rank")?.value || "";
-  const suit = container.querySelector(".poker-suit")?.value || "spades";
+  const suit =
+    document.querySelector(".suit-icon-chip.active")?.dataset.suitOption ||
+    container.querySelector(".suit-icon-chip.active")?.dataset.suitOption ||
+    "spades";
   const value = getPokerRankValue(rank);
 
   return {
@@ -753,13 +744,13 @@ async function runReelingSequence() {
 
 function renderCreelingStep(action) {
   const player = getPlayerById(action.playerId);
-  const suitTextMap = {
-    spades: "spade",
-    clubs: "club",
-    hearts: "heart",
-    diamonds: "diamond"
+  const suitMetaMap = {
+    spades: { label: "黑桃", icon: "spade" },
+    clubs: { label: "梅花", icon: "club" },
+    hearts: { label: "红桃", icon: "heart" },
+    diamonds: { label: "方块", icon: "diamond" }
   };
-  const suitText = suitTextMap[action.discardedPokerCard?.suit] || "未知花色";
+  const suitMeta = suitMetaMap[action.discardedPokerCard?.suit] || { label: "未知花色", icon: null };
 
   if (!action.creelingSummary) {
     action.creelingSummary = getEmptyCreelingSummary();
@@ -829,7 +820,7 @@ function renderCreelingStep(action) {
     <section class="step-block">
       <h3>Step 4: 入篓结算 (Creeling)</h3>
       <p>剩余待处理：${remaining} 张</p>
-      <p class="notice">可上下滚动查看所有待结算鱼牌，并逐条处理。（本次使用花色为${suitText}）</p>
+      <p class="notice">可上下滚动查看所有待结算鱼牌，并逐条处理。（花色：<span class="suit-hint">${suitMeta.icon ? `<i data-lucide="${suitMeta.icon}" aria-hidden="true"></i>` : ""}${suitMeta.label}</span>）</p>
       <div class="creeling-scroll-list">
         ${cardRows}
       </div>

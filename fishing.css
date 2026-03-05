@@ -469,6 +469,14 @@ select {
   background: var(--panel-2);
 }
 
+.poker-card-row .poker-rank {
+  width: 100%;
+}
+
+.poker-card-row .suit-icon-row {
+  justify-content: flex-end;
+}
+
 .suit-icon-row {
   display: flex;
   flex-wrap: wrap;
@@ -496,6 +504,17 @@ select {
 .suit-icon-chip.active {
   border-color: var(--accent-2);
   box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.suit-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.suit-hint svg {
+  width: 1em;
+  height: 1em;
 }
 
 .creel-choice-grid {
