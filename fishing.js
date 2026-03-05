@@ -731,6 +731,13 @@ async function runReelingSequence() {
 
 function renderCreelingStep(action) {
   const player = getPlayerById(action.playerId);
+  const suitTextMap = {
+    spades: "黑桃 ♠",
+    clubs: "梅花 ♣",
+    hearts: "红桃 ♥",
+    diamonds: "方块 ♦"
+  };
+  const suitText = suitTextMap[action.discardedPokerCard?.suit] || "未知花色";
 
   if (!action.creelingSummary) {
     action.creelingSummary = getEmptyCreelingSummary();
@@ -800,7 +807,7 @@ function renderCreelingStep(action) {
     <section class="step-block">
       <h3>Step 4: 入篓结算 (Creeling)</h3>
       <p>剩余待处理：${remaining} 张</p>
-      <p class="notice">可上下滚动查看所有待结算鱼牌，并逐条处理。</p>
+      <p class="notice">可上下滚动查看所有待结算鱼牌，并逐条处理。（本次使用花色为${suitText}）</p>
       <div class="creeling-scroll-list">
         ${cardRows}
       </div>
