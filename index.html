@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Western Legends</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>Western Legends</h1>
+  </header>
+
+  <main class="app-main">
+    <section class="search-section card">
+      <label for="globalSearch" class="label">全局搜索规则</label>
+      <input id="globalSearch" type="search" placeholder="输入关键词：如 逮捕 / 银行 / 0行动点 / 通缉" />
+      <p id="searchHint" class="hint">默认显示当前菜单全部内容</p>
+    </section>
+
+    <section class="primary-nav" aria-label="一级菜单">
+      <button class="tab-btn active" data-tab="turn">回合流程</button>
+      <button class="tab-btn" data-tab="actions">行动速查</button>
+      <button class="tab-btn" data-tab="combat">战斗判定</button>
+      <button class="tab-btn" data-tab="locations">地点功能</button>
+    </section>
+
+    <section id="tab-turn" class="tab-panel active" data-tab-panel>
+      <div class="section-head">
+        <h2 class="title-with-icon"><i data-lucide="clock-3"></i><span>完整回合流程</span></h2>
+      </div>
+      <div id="turn-content" class="content-list"></div>
+    </section>
+
+    <section id="tab-actions" class="tab-panel" data-tab-panel>
+      <div class="section-head">
+        <h2 class="title-with-icon"><i data-lucide="zap"></i><span>行动点与特殊机制</span></h2>
+      </div>
+      <div class="sub-nav" data-sub-nav="actions"></div>
+      <div id="actions-content" class="content-list"></div>
+    </section>
+
+    <section id="tab-combat" class="tab-panel" data-tab-panel>
+      <div class="section-head">
+        <h2 class="title-with-icon"><i data-lucide="swords"></i><span>玩家与 NPC 战斗判定</span></h2>
+      </div>
+      <div class="sub-nav" data-sub-nav="combat"></div>
+      <div id="combat-content" class="content-list"></div>
+    </section>
+
+    <section id="tab-locations" class="tab-panel" data-tab-panel>
+      <div class="section-head">
+        <h2 class="title-with-icon"><i data-lucide="map"></i><span>全地点功能速查</span></h2>
+      </div>
+      <div class="sub-nav" data-sub-nav="locations"></div>
+      <div id="locations-content" class="content-list"></div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="app.js"></script>
+</body>
+</html>
