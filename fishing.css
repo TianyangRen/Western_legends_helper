@@ -321,6 +321,10 @@ input:focus-visible {
   width: min(1320px, 99vw);
 }
 
+.transfer-modal {
+  width: min(760px, 96vw);
+}
+
 .modal-head {
   display: flex;
   align-items: center;
@@ -457,6 +461,11 @@ select {
 }
 
 .hunting-content {
+  display: grid;
+  gap: 12px;
+}
+
+.transfer-content {
   display: grid;
   gap: 12px;
 }

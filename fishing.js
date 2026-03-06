@@ -100,7 +100,8 @@ const state = {
     setupColors: ["red", "blue"],
     selectedPlayerId: null,
     reelingInProgress: false,
-    playerPanelMode: "fish"
+    playerPanelMode: "fish",
+    transferDraft: null
   },
   game: getDefaultGame()
 };
@@ -165,7 +166,12 @@ function cacheDom() {
   dom.playerPanelBody = document.getElementById("playerPanelBody");
   dom.closePlayerPanelBtn = document.getElementById("closePlayerPanelBtn");
   dom.discardSelectedBtn = document.getElementById("discardSelectedBtn");
+  dom.transferSelectedBtn = document.getElementById("transferSelectedBtn");
   dom.sellSelectedBtn = document.getElementById("sellSelectedBtn");
+
+  dom.transferOverlay = document.getElementById("transferOverlay");
+  dom.transferContent = document.getElementById("transferContent");
+  dom.closeTransferBtn = document.getElementById("closeTransferBtn");
 
   dom.fishingOverlay = document.getElementById("fishingOverlay");
   dom.fishingFlowTitle = document.getElementById("fishingFlowTitle");
@@ -186,7 +192,9 @@ function bindBaseEvents() {
 
   dom.closePlayerPanelBtn.addEventListener("click", closePlayerPanel);
   dom.discardSelectedBtn.addEventListener("click", discardSelectedFromPanel);
+  dom.transferSelectedBtn.addEventListener("click", transferSelectedToOtherPlayer);
   dom.sellSelectedBtn.addEventListener("click", sellSelectedFromPanel);
+  dom.closeTransferBtn.addEventListener("click", closeTransferPanel);
 
   dom.startHuntingBtn.addEventListener("click", openHuntingFlow);
   dom.startFishingBtn.addEventListener("click", openFishingFlow);
@@ -202,6 +210,12 @@ function bindBaseEvents() {
   dom.playerOverlay.addEventListener("click", (event) => {
     if (event.target === dom.playerOverlay) {
       closePlayerPanel();
+    }
+  });
+
+  dom.transferOverlay.addEventListener("click", (event) => {
+    if (event.target === dom.transferOverlay) {
+      closeTransferPanel();
     }
   });
 
@@ -370,7 +384,7 @@ function generateGameFromSetup() {
     return {
       playerId: `p${index + 1}`,
       colorId,
-      name: `${color.label}色玩家`,
+      name: `${color.label}玩家`,
       creel: [],
       huntingBag: []
     };
@@ -473,6 +487,7 @@ function renderPlayerPanel() {
   if (!player) {
     dom.playerPanelBody.innerHTML = "<div class=\"notice\">未找到玩家。</div>";
     dom.discardSelectedBtn.disabled = true;
+    dom.transferSelectedBtn.disabled = true;
     dom.sellSelectedBtn.disabled = true;
     return;
   }
@@ -498,6 +513,7 @@ function renderPlayerPanel() {
     dom.playerPanelBody.innerHTML = `${switchHtml}<div class="notice">${mode === "hunting" ? "猎物袋为空。" : "鱼篓为空。"}</div>`;
     bindInventoryModeSwitch();
     dom.discardSelectedBtn.disabled = true;
+    dom.transferSelectedBtn.disabled = true;
     dom.sellSelectedBtn.disabled = true;
     return;
   }
@@ -511,6 +527,7 @@ function renderPlayerPanel() {
   bindHighlightSelection(".panel-check", ".panel-card");
 
   dom.discardSelectedBtn.disabled = false;
+  dom.transferSelectedBtn.disabled = false;
   dom.sellSelectedBtn.disabled = false;
 }
 
@@ -589,6 +606,225 @@ function sellSelectedFromPanel() {
 
   saveState();
   renderAll();
+}
+
+function transferSelectedToOtherPlayer() {
+  const picked = getCheckedValues(".panel-check");
+  if (picked.length === 0) return;
+
+  const giver = getPlayerById(state.runtime.selectedPlayerId);
+  if (!giver) return;
+
+  const receivers = state.game.players.filter((player) => player.playerId !== giver.playerId);
+  if (receivers.length === 0) {
+    setHubMessage("没有可接收的其他玩家。");
+    renderHub();
+    return;
+  }
+
+  state.runtime.transferDraft = {
+    stage: "select-receiver",
+    giverId: giver.playerId,
+    mode: state.runtime.playerPanelMode,
+    picked: [...picked]
+  };
+  renderTransferPanel();
+  dom.transferOverlay.classList.remove("hidden");
+  refreshLucideIcons();
+}
+
+function closeTransferPanel() {
+  dom.transferOverlay.classList.add("hidden");
+  state.runtime.transferDraft = null;
+}
+
+function renderTransferPanel() {
+  const draft = state.runtime.transferDraft;
+  if (!draft) {
+    dom.transferContent.innerHTML = "<div class=\"notice\">没有待转移内容。</div>";
+    return;
+  }
+
+  if (draft.stage === "overflow") {
+    renderTransferOverflowPanel(draft);
+    return;
+  }
+
+  const giver = getPlayerById(draft.giverId);
+  if (!giver) {
+    dom.transferContent.innerHTML = "<div class=\"notice\">未找到转移发起玩家。</div>";
+    return;
+  }
+
+  const receivers = state.game.players.filter((player) => player.playerId !== giver.playerId);
+  const buttons = receivers
+    .map((player) => {
+      const color = getColorById(player.colorId);
+      return `<button class="player-btn" type="button" data-transfer-receiver="${player.playerId}" style="background:${color.hex};color:${color.text}">${player.name}</button>`;
+    })
+    .join("");
+
+  dom.transferContent.innerHTML = `
+    <section class="step-block">
+      <h3>选择接收玩家</h3>
+      <p>${giver.name} 将转移 <strong>${draft.picked.length}</strong> 张${draft.mode === "hunting" ? "猎物" : "鱼牌"}。</p>
+      <div class="player-options hunter-options">${buttons}</div>
+    </section>
+  `;
+
+  dom.transferContent.querySelectorAll("[data-transfer-receiver]").forEach((button) => {
+    button.addEventListener("click", () => {
+      applyTransferToPlayer(button.dataset.transferReceiver);
+    });
+  });
+}
+
+function applyTransferToPlayer(receiverId) {
+  const draft = state.runtime.transferDraft;
+  if (!draft) return;
+
+  const giver = getPlayerById(draft.giverId);
+  const receiver = getPlayerById(receiverId);
+  if (!giver || !receiver || giver.playerId === receiver.playerId) {
+    setHubMessage("接收玩家选择无效，请重试。");
+    closeTransferPanel();
+    renderAll();
+    return;
+  }
+
+  if (draft.mode === "hunting") {
+    giver.huntingBag = giver.huntingBag.filter((cardId) => !draft.picked.includes(cardId));
+    receiver.huntingBag.push(...draft.picked);
+
+    const baseMessage = `${giver.name} 转移了 ${draft.picked.length} 张猎物给 ${receiver.name}。`;
+    if (getPlayerHuntingTotals(receiver).value > 120) {
+      state.runtime.transferDraft = {
+        stage: "overflow",
+        mode: "hunting",
+        giverId: giver.playerId,
+        receiverId: receiver.playerId,
+        baseMessage
+      };
+      renderTransferPanel();
+      refreshLucideIcons();
+      return;
+    }
+
+    setHubMessage(baseMessage);
+  } else {
+    giver.creel = giver.creel.filter((cardId) => !draft.picked.includes(cardId));
+    receiver.creel.push(...draft.picked);
+
+    const baseMessage = `${giver.name} 转移了 ${draft.picked.length} 张鱼牌给 ${receiver.name}。`;
+    if (receiver.creel.length > 5) {
+      state.runtime.transferDraft = {
+        stage: "overflow",
+        mode: "fish",
+        giverId: giver.playerId,
+        receiverId: receiver.playerId,
+        baseMessage
+      };
+      renderTransferPanel();
+      refreshLucideIcons();
+      return;
+    }
+
+    setHubMessage(baseMessage);
+  }
+
+  closeTransferPanel();
+  saveState();
+  renderAll();
+}
+
+function renderTransferOverflowPanel(draft) {
+  const receiver = getPlayerById(draft.receiverId);
+  if (!receiver) {
+    dom.transferContent.innerHTML = "<div class=\"notice\">未找到接收玩家。</div>";
+    return;
+  }
+
+  const isHunting = draft.mode === "hunting";
+  const inventory = isHunting ? receiver.huntingBag : receiver.creel;
+  const cardsHtml = inventory.map((cardId) => renderPanelCard(cardId, "transfer-overflow-check", isHunting ? "hunting" : "fish")).join("");
+
+  const title = isHunting ? "猎物超上限处理" : "鱼篓超上限处理";
+  const hint = isHunting
+    ? `${receiver.name} 当前猎物价值超出 $120，请勾选要弃置的猎物。`
+    : `${receiver.name} 当前鱼篓超出 5 条，请勾选要弃置的鱼牌。`;
+
+  dom.transferContent.innerHTML = `
+    <section class="step-block">
+      <h3>${title}</h3>
+      <p class="notice warn">${hint}</p>
+      <p id="transferOverflowHint" class="notice"></p>
+      <div class="creeling-scroll-list">${cardsHtml}</div>
+      <div class="modal-actions">
+        <button id="confirmTransferOverflowBtn" class="launch-btn" type="button">确认弃置并完成转移</button>
+      </div>
+    </section>
+  `;
+
+  bindHighlightSelection(".transfer-overflow-check", ".panel-card");
+
+  const hintEl = document.getElementById("transferOverflowHint");
+  const confirmBtn = document.getElementById("confirmTransferOverflowBtn");
+
+  const sync = () => {
+    const selected = getCheckedValues(".transfer-overflow-check");
+    if (isHunting) {
+      const currentValue = getPlayerHuntingTotals(receiver).value;
+      const selectedValue = selected.reduce((sum, cardId) => sum + (getHuntingCard(cardId)?.price || 0), 0);
+      const afterValue = currentValue - selectedValue;
+      hintEl.textContent = `当前 $${currentValue} / 120，已选丢弃 $${selectedValue}，丢弃后 $${afterValue}`;
+      confirmBtn.disabled = afterValue > 120;
+    } else {
+      const overflow = receiver.creel.length - 5;
+      hintEl.textContent = `当前 ${receiver.creel.length}/5，至少需弃置 ${overflow} 张，当前已选 ${selected.length} 张`;
+      confirmBtn.disabled = selected.length < overflow;
+    }
+  };
+
+  dom.transferContent.querySelectorAll(".transfer-overflow-check").forEach((input) => {
+    input.addEventListener("change", sync);
+  });
+
+  sync();
+
+  confirmBtn.addEventListener("click", () => {
+    const selected = getCheckedValues(".transfer-overflow-check");
+    const selectedSet = new Set(selected);
+
+    if (isHunting) {
+      const afterValue = receiver.huntingBag
+        .filter((cardId) => !selectedSet.has(cardId))
+        .reduce((sum, cardId) => sum + (getHuntingCard(cardId)?.price || 0), 0);
+
+      if (afterValue > 120) {
+        setHubMessage("仍超过 $120 上限，请继续选择要弃置的猎物。");
+        renderHub();
+        return;
+      }
+
+      receiver.huntingBag = receiver.huntingBag.filter((cardId) => !selectedSet.has(cardId));
+      setHubMessage(`${draft.baseMessage} 超限后已弃置 ${selected.length} 张猎物。`);
+    } else {
+      const overflow = receiver.creel.length - 5;
+      if (selected.length < overflow) {
+        setHubMessage(`请至少选择 ${overflow} 张鱼牌进行弃置。`);
+        renderHub();
+        return;
+      }
+
+      receiver.creel = receiver.creel.filter((cardId) => !selectedSet.has(cardId));
+      selected.forEach((cardId) => moveCardToDiscard(cardId, "transfer-overflow"));
+      setHubMessage(`${draft.baseMessage} 超限后已弃置 ${selected.length} 张鱼牌。`);
+    }
+
+    closeTransferPanel();
+    saveState();
+    renderAll();
+  });
 }
 
 function openFishingFlow() {

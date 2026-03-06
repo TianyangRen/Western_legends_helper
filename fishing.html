@@ -90,8 +90,20 @@
 
       <footer class="modal-actions">
         <button id="discardSelectedBtn" class="ghost-btn" type="button">丢弃所选</button>
+        <button id="transferSelectedBtn" class="ghost-btn" type="button"><i data-lucide="arrow-right-left" aria-hidden="true"></i><span>转移给其他玩家</span></button>
         <button id="sellSelectedBtn" class="launch-btn" type="button"><i data-lucide="hand-coins" aria-hidden="true"></i><span>在牧场出售所选</span></button>
       </footer>
+    </section>
+  </div>
+
+  <div id="transferOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="transferTitle">
+    <section class="modal panel transfer-modal">
+      <header class="modal-head">
+        <h2 id="transferTitle">转移给其他玩家</h2>
+        <button id="closeTransferBtn" class="icon-btn" type="button" aria-label="关闭转移面板">×</button>
+      </header>
+
+      <div id="transferContent" class="transfer-content"></div>
     </section>
   </div>
 
