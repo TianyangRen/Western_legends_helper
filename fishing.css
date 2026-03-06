@@ -474,6 +474,16 @@ select {
   gap: 8px;
 }
 
+.hunter-options {
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.hunt-size-options {
+  gap: 12px;
+  margin-top: 12px;
+}
+
 .inventory-switch {
   display: flex;
   flex-wrap: wrap;
@@ -485,6 +495,11 @@ select {
 .inventory-btn.active {
   border-color: var(--accent-2);
   box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.hunting-content .player-btn.inventory-btn.active {
+  border-color: #fff6df;
+  box-shadow: 0 0 0 3px rgba(250, 242, 219, 0.32), 0 0 0 1px rgba(255, 255, 255, 0.4) inset;
 }
 
 .hunting-card-choice {

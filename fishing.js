@@ -117,7 +117,7 @@ function getDefaultGame() {
     huntingDiscard: [],
     huntingRemoved: [],
     huntingAction: null,
-    lastMessage: "请先进入设置并生成鱼池。",
+    lastMessage: "请先进入设置并生成公共牌堆。",
     variants: {
       legendaryRun: false,
       limitedPool: false,
@@ -448,7 +448,7 @@ function renderDock() {
     chip.className = `player-chip ${DOCK_POSITIONS[index] || DOCK_POSITIONS[DOCK_POSITIONS.length - 1]}`;
     chip.style.background = chipColor;
     chip.style.color = color.text;
-    chip.innerHTML = `<span class="chip-player-name">${player.name}</span><small class="chip-line"><span class="chip-line-item"><i data-lucide="fish" aria-hidden="true"></i>鱼篓 ${player.creel.length}/5</span><span class="chip-divider">|</span><span class="chip-line-item"><i data-lucide="scale" aria-hidden="true"></i>点数 ${totals.might}</span><span class="chip-divider">|</span><span class="chip-line-item"><i data-lucide="coins" aria-hidden="true"></i>$${totals.money}</span></small><small class="chip-line"><span class="chip-line-item"><i data-lucide="paw-print" aria-hidden="true"></i>猎物 ${player.huntingBag.length}</span><span class="chip-divider">|</span><span class="chip-line-item"><i data-lucide="badge-dollar-sign" aria-hidden="true"></i>$${huntingTotals.value}/120</span></small>`;
+    chip.innerHTML = `<span class="chip-player-name">${player.name}</span><small class="chip-line"><span class="chip-line-item"><i data-lucide="fish" aria-hidden="true"></i>鱼篓 ${player.creel.length}/5</span><span class="chip-divider">|</span><span class="chip-line-item"><i data-lucide="scale" aria-hidden="true"></i>点数 ${totals.might}</span><span class="chip-divider">|</span><span class="chip-line-item"><i data-lucide="badge-dollar-sign" aria-hidden="true"></i>$${totals.money}</span></small><small class="chip-line"><span class="chip-line-item"><i data-lucide="paw-print" aria-hidden="true"></i>猎物 ${player.huntingBag.length}</span><span class="chip-divider">|</span><span class="chip-line-item"><i data-lucide="badge-dollar-sign" aria-hidden="true"></i>$${huntingTotals.value}/120</span></small>`;
 
     chip.addEventListener("click", () => {
       state.runtime.selectedPlayerId = player.playerId;
@@ -665,8 +665,8 @@ function renderHuntingTargetStep() {
     <section class="step-block">
       <h3>阶段 1：选择目标体型</h3>
       <p>先选择猎手，再选择本次狩猎目标体型。</p>
-      <div class="player-options">${playerButtons}</div>
-      <div class="player-options">
+      <div class="player-options hunter-options">${playerButtons}</div>
+      <div class="player-options hunt-size-options">
         <button class="launch-btn" data-hunt-size="1" type="button">体型 1 (小型)</button>
         <button class="launch-btn" data-hunt-size="2" type="button">体型 2 (中型)</button>
         <button class="launch-btn" data-hunt-size="3" type="button">体型 3 (大型)</button>
@@ -788,8 +788,8 @@ function renderHuntingDecisionStep(action) {
       ${eventToggleHtml}
       ${renderHuntingCardPreview(card)}
       <div class="modal-actions">
-        <button id="avoidHuntBtn" class="ghost-btn" type="button"><i data-lucide="wind" aria-hidden="true"></i><span>避开 (Avoid)</span></button>
-        <button id="encounterHuntBtn" class="launch-btn" type="button"><i data-lucide="swords" aria-hidden="true"></i><span>遭遇 (Encounter)</span></button>
+        <button id="avoidHuntBtn" class="ghost-btn" type="button"><i data-lucide="wind" aria-hidden="true"></i><span>避开</span></button>
+        <button id="encounterHuntBtn" class="launch-btn" type="button"><i data-lucide="swords" aria-hidden="true"></i><span>遭遇</span></button>
       </div>
     </section>
   `;
