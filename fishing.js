@@ -370,7 +370,7 @@ function generateGameFromSetup() {
     return {
       playerId: `p${index + 1}`,
       colorId,
-      name: `${color.label}玩家`,
+      name: `${color.label}色玩家`,
       creel: [],
       huntingBag: []
     };
