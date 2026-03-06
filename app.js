@@ -385,11 +385,11 @@ function getCardIcon(tab, item) {
     if (item.section === "金矿") return "pickaxe";
     if (item.section === "酒馆") return "club";
     if (item.section === "杂货店") return "barrel";
-    if (item.section === "诊所") return "hospital";
+    if (item.section === "诊所") return "building-hospital";
     if (item.section === "俱乐部") return "drama";
     if (item.section === "火车") return "train";
     if (item.section === "逃犯窝点") return "tent-tree";
-    if (item.section === "山洞隧道") return "rail-symbol";
+    if (item.section === "山洞隧道") return "building-tunnel";
     if (item.section === "警长办公室") return "square-star";
     if (item.section === "旅行商人") return "baggage-claim";
     if (item.section === "匪徒营地") return "flame-kindling";
@@ -397,6 +397,86 @@ function getCardIcon(tab, item) {
   }
 
   return "book-open";
+}
+
+function createTablerBuildingTunnelIcon() {
+  const SVG_NS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(SVG_NS, "svg");
+
+  svg.setAttribute("xmlns", SVG_NS);
+  svg.setAttribute("width", "24");
+  svg.setAttribute("height", "24");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("fill", "none");
+  svg.setAttribute("stroke", "currentColor");
+  svg.setAttribute("stroke-width", "1.75");
+  svg.setAttribute("stroke-linecap", "round");
+  svg.setAttribute("stroke-linejoin", "round");
+  svg.setAttribute("class", "icon icon-tabler icons-tabler-outline icon-tabler-building-tunnel");
+
+  const bgPath = document.createElementNS(SVG_NS, "path");
+  bgPath.setAttribute("stroke", "none");
+  bgPath.setAttribute("d", "M0 0h24v24H0z");
+  bgPath.setAttribute("fill", "none");
+  svg.appendChild(bgPath);
+
+  const pathData = [
+    "M5 21h14a2 2 0 0 0 2 -2v-7a9 9 0 0 0 -18 0v7a2 2 0 0 0 2 2",
+    "M8 21v-9a4 4 0 1 1 8 0v9",
+    "M3 17h4",
+    "M17 17h4",
+    "M21 12h-4",
+    "M7 12h-4",
+    "M12 3v5",
+    "M6 6l3 3",
+    "M15 9l3 -3l-3 3"
+  ];
+
+  pathData.forEach((d) => {
+    const p = document.createElementNS(SVG_NS, "path");
+    p.setAttribute("d", d);
+    svg.appendChild(p);
+  });
+
+  return svg;
+}
+
+function createTablerBuildingHospitalIcon() {
+  const SVG_NS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(SVG_NS, "svg");
+
+  svg.setAttribute("xmlns", SVG_NS);
+  svg.setAttribute("width", "24");
+  svg.setAttribute("height", "24");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("fill", "none");
+  svg.setAttribute("stroke", "currentColor");
+  svg.setAttribute("stroke-width", "1.75");
+  svg.setAttribute("stroke-linecap", "round");
+  svg.setAttribute("stroke-linejoin", "round");
+  svg.setAttribute("class", "icon icon-tabler icons-tabler-outline icon-tabler-building-hospital");
+
+  const bgPath = document.createElementNS(SVG_NS, "path");
+  bgPath.setAttribute("stroke", "none");
+  bgPath.setAttribute("d", "M0 0h24v24H0z");
+  bgPath.setAttribute("fill", "none");
+  svg.appendChild(bgPath);
+
+  const pathData = [
+    "M3 21l18 0",
+    "M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16",
+    "M9 21v-4a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v4",
+    "M10 9l4 0",
+    "M12 7l0 4"
+  ];
+
+  pathData.forEach((d) => {
+    const p = document.createElementNS(SVG_NS, "path");
+    p.setAttribute("d", d);
+    svg.appendChild(p);
+  });
+
+  return svg;
 }
 
 function createTablerHexagonIcon(name) {
@@ -431,6 +511,14 @@ function createTablerHexagonIcon(name) {
 function createIconNode(iconName) {
   if (iconName === "hexagon-number-0" || iconName === "hexagon-number-1") {
     return createTablerHexagonIcon(iconName);
+  }
+
+  if (iconName === "building-tunnel") {
+    return createTablerBuildingTunnelIcon();
+  }
+
+  if (iconName === "building-hospital") {
+    return createTablerBuildingHospitalIcon();
   }
 
   const icon = document.createElement("i");
