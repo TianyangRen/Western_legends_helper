@@ -629,7 +629,7 @@ function closeHuntingFlow() {
 function renderHuntingFlow() {
   const action = state.game.huntingAction;
   if (!action) {
-    dom.huntingFlowTitle.textContent = "狩猎行动流";
+    dom.huntingFlowTitle.textContent = "狩猎行动";
     dom.huntingOverlay.querySelector(".hunting-modal").style.borderColor = "";
     renderHuntingTargetStep();
     return;
@@ -638,7 +638,7 @@ function renderHuntingFlow() {
   const player = getPlayerById(action.playerId);
   if (player) {
     const color = getColorById(player.colorId);
-    dom.huntingFlowTitle.textContent = `狩猎行动流 - ${player.name}`;
+    dom.huntingFlowTitle.textContent = `狩猎行动 - ${player.name}`;
     dom.huntingOverlay.querySelector(".hunting-modal").style.borderColor = color.hex;
   }
 
@@ -1007,6 +1007,7 @@ function finishHuntingAction(playerId, message) {
   state.game.huntingAction = null;
   setHubMessage(`${player?.name || "玩家"}：${message}`);
   saveState();
+  closeHuntingFlow();
   renderAll();
 }
 
@@ -1051,7 +1052,7 @@ function renderFishingFlow() {
   const player = getPlayerById(action.playerId);
   if (player) {
     const color = getColorById(player.colorId);
-    dom.fishingFlowTitle.textContent = `钓鱼行动流 - ${player.name}`;
+    dom.fishingFlowTitle.textContent = `钓鱼行动 - ${player.name}`;
     dom.fishingOverlay.querySelector(".fishing-modal").style.borderColor = color.hex;
   }
 
@@ -1065,7 +1066,7 @@ function renderFishingFlow() {
 }
 
 function renderFishingIdentityStep() {
-  dom.fishingFlowTitle.textContent = "钓鱼行动流";
+  dom.fishingFlowTitle.textContent = "钓鱼行动";
   dom.fishingOverlay.querySelector(".fishing-modal").style.borderColor = "";
 
   const buttons = state.game.players
@@ -1128,7 +1129,7 @@ function renderSteelingStep(action) {
 
   dom.fishingContent.innerHTML = `
     <section class="step-block">
-      <h3>Step 2: 蓄力 (Steeling)</h3>
+      <h3>Step 2: 蓄力</h3>
       <div class="form-row">
         <label>弃掉的扑克牌（只能 1 张，选择点数和花色）</label>
         <div class="poker-rows">${pokerCardInput}</div>
@@ -1415,7 +1416,7 @@ function renderCreelingStep(action) {
 
   dom.fishingContent.innerHTML = `
     <section class="step-block">
-      <h3>Step 4: 入篓结算 (Creeling)</h3>
+      <h3>Step 4: 入篓结算</h3>
       <p>剩余待处理：${remaining} 张</p>
       <p class="notice">可上下滚动查看所有待结算鱼牌，并逐条处理。（花色：<span class="suit-hint">${suitMeta.icon ? `<i data-lucide="${suitMeta.icon}" aria-hidden="true"></i>` : ""}${suitMeta.label}</span>）</p>
       <div class="creeling-scroll-list">
