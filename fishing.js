@@ -1,6 +1,74 @@
 const STORAGE_KEY = "wl-fishing-state-v1";
 const DATA_URL = "Expansions/Fishing_v5/fish-cards.json";
 const CARD_BACK = "Expansions/Fishing_v5/back.jpg";
+const HUNTING_CARD_BACK = "Expansions/Hunting_V5/Back.jpg";
+
+const HUNTING_CARD_DEFS = [
+  [1, "Prairie Dog", 1, 3, 5, 1, false, "$5"],
+  [2, "Hare", 1, 4, 5, 1, false, "$5"],
+  [3, "Beaver", 1, 4, 5, 1, false, "$5"],
+  [4, "Raccoon", 1, 5, 5, 1, false, "$5"],
+  [5, "Badger", 1, 5, 5, 1, false, "$5"],
+  [6, "Porcupine", 1, 6, 5, 1, false, "$5"],
+  [7, "Tarantula", 1, 4, 10, 1, false, "$10"],
+  [8, "Desert Centipede", 1, 5, 10, 1, false, "$10"],
+  [9, "Scorpion", 1, 5, 10, 1, false, "$10"],
+  [10, "Gila Monster", 1, 6, 10, 1, false, "$10"],
+  [11, "Snapping Turtle", 1, 6, 10, 1, false, "$10"],
+  [12, "Rattlesnake", 1, 7, 10, 1, false, "$10"],
+  [13, "Pronghorn", 2, 9, 15, 2, false, "$15"],
+  [14, "Deer", 2, 10, 15, 2, false, "$15"],
+  [15, "Bighorn Sheep", 2, 11, 15, 2, false, "$15"],
+  [16, "Elk", 2, 12, 15, 2, false, "$15"],
+  [17, "Fox", 2, 11, 20, 2, false, "$20"],
+  [18, "Coyote", 2, 12, 20, 2, false, "$20"],
+  [19, "Wolf", 2, 13, 20, 2, false, "$20"],
+  [20, "Mountain Lion", 2, 14, 20, 2, false, "$20"],
+  [21, "Bison", 3, 16, 25, 3, false, "$25"],
+  [22, "Bison", 3, 18, 25, 3, false, "$25"],
+  [23, "Black Bear", 3, 18, 30, 3, false, "$30"],
+  [24, "Grizzly Bear", 3, 21, 30, 3, false, "$30"],
+  [25, "Quail", 1, 3, 5, 1, false, "$5"],
+  [26, "Crow", 1, 3, 5, 1, false, "$5"],
+  [27, "Pheasant", 1, 4, 5, 1, false, "$5"],
+  [28, "Mallard", 1, 4, 5, 1, false, "$5"],
+  [29, "Turkey", 1, 5, 5, 1, false, "$5"],
+  [30, "Great Horned Owl", 1, 5, 5, 1, false, "$5"],
+  [31, "Red-tailed Hawk", 1, 6, 5, 1, false, "$5"],
+  [32, "Golden Eagle", 1, 6, 5, 1, false, "$5"],
+  [33, "Deer", 2, 17, 15, 2, true, "$15 + Legendary"],
+  [34, "Bull Elk", 2, 19, 15, 2, true, "$15 + Legendary"],
+  [35, "Fox", 2, 18, 20, 2, true, "$20 + Legendary"],
+  [36, "Coyote", 2, 19, 20, 2, true, "$20 + Legendary"],
+  [37, "Wolf", 2, 20, 20, 2, true, "$20 + Legendary"],
+  [38, "Bison", 3, 25, 25, 3, true, "$25 + Legendary"],
+  [39, "Black Bear", 3, 25, 30, 3, true, "$30 + Legendary"],
+  [40, "Grizzly Bear", 3, 28, 50, 3, true, "$50 + Legendary"]
+];
+
+const HUNTING_CARDS = HUNTING_CARD_DEFS.map(([index, name, size, health, price, repercussions, isLegendary, reward]) => {
+  const id = `H-${String(index).padStart(2, "0")}`;
+  return {
+    id,
+    name,
+    size,
+    health,
+    price,
+    repercussions,
+    isLegendary,
+    reward,
+    image: `Expansions/Hunting_V5/${id}.jpg`
+  };
+});
+
+const HUNTING_EVENTS = Array.from({ length: 10 }, (_, index) => {
+  const id = `H-${String(index + 41).padStart(2, "0")}`;
+  return {
+    id,
+    name: `Event ${index + 1}`,
+    image: `Expansions/Hunting_V5/${id}.jpg`
+  };
+});
 
 const PLAYER_COLORS = [
   { id: "red", label: "红", hex: "#d73a33", text: "#ffffff" },
@@ -24,22 +92,31 @@ const dom = {};
 const state = {
   catalog: [],
   catalogMap: new Map(),
+  huntingCatalog: HUNTING_CARDS,
+  huntingCatalogMap: new Map(HUNTING_CARDS.map((card) => [card.id, card])),
+  huntingEvents: HUNTING_EVENTS,
+  huntingEventMap: new Map(HUNTING_EVENTS.map((event) => [event.id, event])),
   runtime: {
     setupColors: ["red", "blue"],
     selectedPlayerId: null,
-    reelingInProgress: false
+    reelingInProgress: false,
+    playerPanelMode: "fish"
   },
   game: getDefaultGame()
 };
 
 function getDefaultGame() {
   return {
-    version: 1,
+    version: 2,
     initialized: false,
     players: [],
     drawPile: [],
     discardPile: [],
     action: null,
+    huntingDeck: [],
+    huntingDiscard: [],
+    huntingRemoved: [],
+    huntingAction: null,
     lastMessage: "请先进入设置并生成鱼池。",
     variants: {
       legendaryRun: false,
@@ -66,10 +143,13 @@ async function init() {
 }
 
 function cacheDom() {
-  dom.drawCount = document.getElementById("drawCount");
-  dom.discardCount = document.getElementById("discardCount");
+  dom.fishDrawCount = document.getElementById("fishDrawCount");
+  dom.fishDiscardCount = document.getElementById("fishDiscardCount");
+  dom.huntDrawCount = document.getElementById("huntDrawCount");
+  dom.huntDiscardCount = document.getElementById("huntDiscardCount");
   dom.hubStatus = document.getElementById("hubStatus");
   dom.playerDock = document.getElementById("playerDock");
+  dom.startHuntingBtn = document.getElementById("startHuntingBtn");
   dom.startFishingBtn = document.getElementById("startFishingBtn");
 
   dom.setupOverlay = document.getElementById("setupOverlay");
@@ -91,6 +171,11 @@ function cacheDom() {
   dom.fishingFlowTitle = document.getElementById("fishingFlowTitle");
   dom.fishingContent = document.getElementById("fishingContent");
   dom.closeFishingBtn = document.getElementById("closeFishingBtn");
+
+  dom.huntingOverlay = document.getElementById("huntingOverlay");
+  dom.huntingFlowTitle = document.getElementById("huntingFlowTitle");
+  dom.huntingContent = document.getElementById("huntingContent");
+  dom.closeHuntingBtn = document.getElementById("closeHuntingBtn");
 }
 
 function bindBaseEvents() {
@@ -103,8 +188,10 @@ function bindBaseEvents() {
   dom.discardSelectedBtn.addEventListener("click", discardSelectedFromPanel);
   dom.sellSelectedBtn.addEventListener("click", sellSelectedFromPanel);
 
+  dom.startHuntingBtn.addEventListener("click", openHuntingFlow);
   dom.startFishingBtn.addEventListener("click", openFishingFlow);
   dom.closeFishingBtn.addEventListener("click", closeFishingFlow);
+  dom.closeHuntingBtn.addEventListener("click", closeHuntingFlow);
 
   dom.setupOverlay.addEventListener("click", (event) => {
     if (event.target === dom.setupOverlay) {
@@ -121,6 +208,12 @@ function bindBaseEvents() {
   dom.fishingOverlay.addEventListener("click", (event) => {
     if (event.target === dom.fishingOverlay) {
       closeFishingFlow();
+    }
+  });
+
+  dom.huntingOverlay.addEventListener("click", (event) => {
+    if (event.target === dom.huntingOverlay) {
+      closeHuntingFlow();
     }
   });
 }
@@ -141,12 +234,31 @@ function loadState() {
     }
 
     const parsed = JSON.parse(raw);
-    if (!parsed || parsed.version !== 1 || !Array.isArray(parsed.drawPile) || !Array.isArray(parsed.players)) {
+    if (!parsed || !Array.isArray(parsed.drawPile) || !Array.isArray(parsed.players)) {
       state.game = getDefaultGame();
       return;
     }
 
-    state.game = parsed;
+    state.game = {
+      ...getDefaultGame(),
+      ...parsed,
+      players: parsed.players.map((player) => ({
+        ...player,
+        creel: Array.isArray(player.creel) ? player.creel : [],
+        huntingBag: Array.isArray(player.huntingBag) ? player.huntingBag : []
+      })),
+      drawPile: Array.isArray(parsed.drawPile) ? parsed.drawPile : [],
+      discardPile: Array.isArray(parsed.discardPile) ? parsed.discardPile : [],
+      huntingDeck: Array.isArray(parsed.huntingDeck) ? parsed.huntingDeck : [],
+      huntingDiscard: Array.isArray(parsed.huntingDiscard) ? parsed.huntingDiscard : [],
+      huntingRemoved: Array.isArray(parsed.huntingRemoved) ? parsed.huntingRemoved : []
+    };
+
+    state.game.version = 2;
+
+    if (state.game.huntingDeck.length === 0) {
+      state.game.huntingDeck = shuffle(getHuntingDeckSeedIds());
+    }
 
     if (state.game.players.length >= 2) {
       state.runtime.setupColors = state.game.players.map((player) => player.colorId);
@@ -259,7 +371,8 @@ function generateGameFromSetup() {
       playerId: `p${index + 1}`,
       colorId,
       name: `${color.label}玩家`,
-      creel: []
+      creel: [],
+      huntingBag: []
     };
   });
 
@@ -267,8 +380,12 @@ function generateGameFromSetup() {
   state.game.drawPile = shuffle(ids);
   state.game.discardPile = [];
   state.game.action = null;
+  state.game.huntingDeck = shuffle(getHuntingDeckSeedIds());
+  state.game.huntingDiscard = [];
+  state.game.huntingRemoved = [];
+  state.game.huntingAction = null;
   state.game.initialized = true;
-  setHubMessage(`公共鱼池已生成，共 ${state.game.drawPile.length} 张。`);
+  setHubMessage(`垂钓牌堆已生成，共 ${state.game.drawPile.length} 张；狩猎牌堆已生成，共 ${state.game.huntingDeck.length} 张。`);
 
   saveState();
   closeSetup();
@@ -280,6 +397,7 @@ function resetLocalGame() {
   state.game = getDefaultGame();
   state.runtime.selectedPlayerId = null;
   state.runtime.reelingInProgress = false;
+  state.runtime.playerPanelMode = "fish";
   syncSetupColors(2);
   renderAll();
   openSetup();
@@ -297,13 +415,20 @@ function renderAll() {
     renderFishingFlow();
   }
 
+  if (!dom.huntingOverlay.classList.contains("hidden")) {
+    renderHuntingFlow();
+  }
+
   refreshLucideIcons();
 }
 
 function renderHub() {
-  dom.drawCount.textContent = String(state.game.drawPile.length);
-  dom.discardCount.textContent = String(state.game.discardPile.length);
+  dom.fishDrawCount.textContent = String(state.game.drawPile.length);
+  dom.fishDiscardCount.textContent = String(state.game.discardPile.length);
+  dom.huntDrawCount.textContent = String(state.game.huntingDeck.length);
+  dom.huntDiscardCount.textContent = String(state.game.huntingDiscard.length);
   dom.hubStatus.textContent = state.game.lastMessage;
+  dom.startHuntingBtn.disabled = !state.game.initialized || state.game.players.length === 0;
   dom.startFishingBtn.disabled = !state.game.initialized || state.game.players.length === 0;
 }
 
@@ -318,11 +443,12 @@ function renderDock() {
     const color = getColorById(player.colorId);
     const chipColor = getDockChipColor(player.colorId);
     const totals = getPlayerCreelTotals(player);
+    const huntingTotals = getPlayerHuntingTotals(player);
     const chip = document.createElement("button");
     chip.className = `player-chip ${DOCK_POSITIONS[index] || DOCK_POSITIONS[DOCK_POSITIONS.length - 1]}`;
     chip.style.background = chipColor;
     chip.style.color = color.text;
-    chip.innerHTML = `<span>${player.name}</span><small>点数 ${totals.might} | $${totals.money} | <span class="chip-fish-count"><i data-lucide="fish" aria-hidden="true"></i>${player.creel.length}/5</span></small>`;
+    chip.innerHTML = `<span class="chip-player-name">${player.name}</span><small class="chip-line"><span class="chip-line-item"><i data-lucide="fish" aria-hidden="true"></i>鱼篓 ${player.creel.length}/5</span><span class="chip-divider">|</span><span class="chip-line-item"><i data-lucide="scale" aria-hidden="true"></i>点数 ${totals.might}</span><span class="chip-divider">|</span><span class="chip-line-item"><i data-lucide="coins" aria-hidden="true"></i>$${totals.money}</span></small><small class="chip-line"><span class="chip-line-item"><i data-lucide="paw-print" aria-hidden="true"></i>猎物 ${player.huntingBag.length}</span><span class="chip-divider">|</span><span class="chip-line-item"><i data-lucide="badge-dollar-sign" aria-hidden="true"></i>$${huntingTotals.value}/120</span></small>`;
 
     chip.addEventListener("click", () => {
       state.runtime.selectedPlayerId = player.playerId;
@@ -352,21 +478,35 @@ function renderPlayerPanel() {
   }
 
   const color = getColorById(player.colorId);
-  dom.playerPanelTitle.textContent = `${player.name} - 鱼篓 (${player.creel.length}/5)`;
+  const huntingTotals = getPlayerHuntingTotals(player);
+  dom.playerPanelTitle.textContent = `${player.name} - 鱼篓 ${player.creel.length}/5 | 猎物 ${player.huntingBag.length} ($${huntingTotals.value}/120)`;
 
   const modal = dom.playerOverlay.querySelector(".player-modal");
   modal.style.borderColor = color.hex;
 
-  if (player.creel.length === 0) {
-    dom.playerPanelBody.innerHTML = "<div class=\"notice\">鱼篓为空。</div>";
+  const mode = state.runtime.playerPanelMode;
+  const inventory = mode === "hunting" ? player.huntingBag : player.creel;
+
+  const switchHtml = `
+    <div class="inventory-switch">
+      <button class="ghost-btn inventory-btn ${mode === "fish" ? "active" : ""}" type="button" data-inventory-mode="fish"><i data-lucide="fish" aria-hidden="true"></i><span>鱼篓</span></button>
+      <button class="ghost-btn inventory-btn ${mode === "hunting" ? "active" : ""}" type="button" data-inventory-mode="hunting"><i data-lucide="paw-print" aria-hidden="true"></i><span>猎物袋</span></button>
+    </div>
+  `;
+
+  if (inventory.length === 0) {
+    dom.playerPanelBody.innerHTML = `${switchHtml}<div class="notice">${mode === "hunting" ? "猎物袋为空。" : "鱼篓为空。"}</div>`;
+    bindInventoryModeSwitch();
     dom.discardSelectedBtn.disabled = true;
     dom.sellSelectedBtn.disabled = true;
     return;
   }
 
-  dom.playerPanelBody.innerHTML = player.creel
-    .map((cardId) => renderPanelCard(cardId, "panel-check"))
-    .join("");
+  dom.playerPanelBody.innerHTML = `${switchHtml}${inventory
+    .map((cardId) => renderPanelCard(cardId, "panel-check", mode))
+    .join("")}`;
+
+  bindInventoryModeSwitch();
 
   bindHighlightSelection(".panel-check", ".panel-card");
 
@@ -374,15 +514,29 @@ function renderPlayerPanel() {
   dom.sellSelectedBtn.disabled = false;
 }
 
-function renderPanelCard(cardId, inputClassName) {
-  const card = getCard(cardId);
+function bindInventoryModeSwitch() {
+  dom.playerPanelBody.querySelectorAll("[data-inventory-mode]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.runtime.playerPanelMode = button.dataset.inventoryMode;
+      renderPlayerPanel();
+      refreshLucideIcons();
+    });
+  });
+}
+
+function renderPanelCard(cardId, inputClassName, mode = "fish") {
+  const card = mode === "hunting" ? getHuntingCard(cardId) : getCard(cardId);
   if (!card) return "";
+
+  const detailText = mode === "hunting"
+    ? `体型 ${card.size} | 生命 ${card.health} | 价格 $${card.price}`
+    : `点数 ${card.might} | 价格 $${card.price}`;
 
   return `
     <label class="panel-card">
       <img src="${card.image}" alt="${card.name}" />
       <h3>${card.name}</h3>
-      <p>点数 ${card.might} | 价格 $${card.price}</p>
+      <p>${detailText}</p>
       <input type="checkbox" class="${inputClassName}" value="${card.id}" />
     </label>
   `;
@@ -401,10 +555,15 @@ function discardSelectedFromPanel() {
   const player = getPlayerById(state.runtime.selectedPlayerId);
   if (!player) return;
 
-  player.creel = player.creel.filter((cardId) => !picked.includes(cardId));
-  picked.forEach((cardId) => moveCardToDiscard(cardId, "discard"));
+  if (state.runtime.playerPanelMode === "hunting") {
+    player.huntingBag = player.huntingBag.filter((cardId) => !picked.includes(cardId));
+    setHubMessage(`${player.name} 丢弃了 ${picked.length} 张猎物牌（返回牌盒）。`);
+  } else {
+    player.creel = player.creel.filter((cardId) => !picked.includes(cardId));
+    picked.forEach((cardId) => moveCardToDiscard(cardId, "discard"));
+    setHubMessage(`${player.name} 丢弃了 ${picked.length} 张鱼牌。`);
+  }
 
-  setHubMessage(`${player.name} 丢弃了 ${picked.length} 张鱼牌。`);
   saveState();
   renderAll();
 }
@@ -416,13 +575,18 @@ function sellSelectedFromPanel() {
   const player = getPlayerById(state.runtime.selectedPlayerId);
   if (!player) return;
 
-  const total = picked.reduce((sum, cardId) => sum + (getCard(cardId)?.price || 0), 0);
-  const payout = Math.floor(total / 10) * 10;
+  if (state.runtime.playerPanelMode === "hunting") {
+    const total = picked.reduce((sum, cardId) => sum + (getHuntingCard(cardId)?.price || 0), 0);
+    player.huntingBag = player.huntingBag.filter((cardId) => !picked.includes(cardId));
+    setHubMessage(`${player.name} 在牧场出售 ${picked.length} 张猎物，结算 $${total}。`);
+  } else {
+    const total = picked.reduce((sum, cardId) => sum + (getCard(cardId)?.price || 0), 0);
+    const payout = Math.floor(total / 10) * 10;
+    player.creel = player.creel.filter((cardId) => !picked.includes(cardId));
+    picked.forEach((cardId) => moveCardToDiscard(cardId, "sell"));
+    setHubMessage(`${player.name} 在牧场出售 ${picked.length} 张鱼，结算 $${payout}。`);
+  }
 
-  player.creel = player.creel.filter((cardId) => !picked.includes(cardId));
-  picked.forEach((cardId) => moveCardToDiscard(cardId, "sell"));
-
-  setHubMessage(`${player.name} 在牧场出售 ${picked.length} 张鱼，结算 $${payout}。`);
   saveState();
   renderAll();
 }
@@ -441,6 +605,439 @@ function openFishingFlow() {
 function closeFishingFlow() {
   if (state.runtime.reelingInProgress) return;
   dom.fishingOverlay.classList.add("hidden");
+}
+
+function openHuntingFlow() {
+  if (!state.game.initialized || state.game.players.length === 0) {
+    setHubMessage("请先完成设置。");
+    renderHub();
+    return;
+  }
+
+  if (!state.runtime.selectedPlayerId) {
+    state.runtime.selectedPlayerId = state.game.players[0]?.playerId || null;
+  }
+
+  dom.huntingOverlay.classList.remove("hidden");
+  renderHuntingFlow();
+}
+
+function closeHuntingFlow() {
+  dom.huntingOverlay.classList.add("hidden");
+}
+
+function renderHuntingFlow() {
+  const action = state.game.huntingAction;
+  if (!action) {
+    dom.huntingFlowTitle.textContent = "狩猎行动流";
+    dom.huntingOverlay.querySelector(".hunting-modal").style.borderColor = "";
+    renderHuntingTargetStep();
+    return;
+  }
+
+  const player = getPlayerById(action.playerId);
+  if (player) {
+    const color = getColorById(player.colorId);
+    dom.huntingFlowTitle.textContent = `狩猎行动流 - ${player.name}`;
+    dom.huntingOverlay.querySelector(".hunting-modal").style.borderColor = color.hex;
+  }
+
+  if (action.step === "decision") {
+    renderHuntingDecisionStep(action);
+  } else if (action.step === "encounter") {
+    renderHuntingEncounterStep(action);
+  } else if (action.step === "overlimit") {
+    renderHuntingOverlimitStep(action);
+  }
+}
+
+function renderHuntingTargetStep() {
+  const selectedPlayerId = state.runtime.selectedPlayerId || state.game.players[0]?.playerId;
+  const playerButtons = state.game.players
+    .map((player) => {
+      const color = getColorById(player.colorId);
+      const active = player.playerId === selectedPlayerId ? "active" : "";
+      return `<button class="player-btn inventory-btn ${active}" data-hunter="${player.playerId}" style="background:${color.hex};color:${color.text}" type="button">${player.name}</button>`;
+    })
+    .join("");
+
+  dom.huntingContent.innerHTML = `
+    <section class="step-block">
+      <h3>阶段 1：选择目标体型</h3>
+      <p>先选择猎手，再选择本次狩猎目标体型。</p>
+      <div class="player-options">${playerButtons}</div>
+      <div class="player-options">
+        <button class="launch-btn" data-hunt-size="1" type="button">体型 1 (小型)</button>
+        <button class="launch-btn" data-hunt-size="2" type="button">体型 2 (中型)</button>
+        <button class="launch-btn" data-hunt-size="3" type="button">体型 3 (大型)</button>
+      </div>
+    </section>
+  `;
+
+  dom.huntingContent.querySelectorAll("[data-hunter]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.runtime.selectedPlayerId = button.dataset.hunter;
+      renderHuntingTargetStep();
+      refreshLucideIcons();
+    });
+  });
+
+  dom.huntingContent.querySelectorAll("[data-hunt-size]").forEach((button) => {
+    button.addEventListener("click", () => {
+      startHuntingScout(Number(button.dataset.huntSize));
+    });
+  });
+}
+
+function startHuntingScout(targetSize) {
+  const playerId = state.runtime.selectedPlayerId || state.game.players[0]?.playerId;
+  const player = getPlayerById(playerId);
+  if (!player) return;
+
+  const scoutingDiscard = [];
+  const skippedEventsToReturn = [];
+  const eventLog = [];
+  const eventHits = [];
+  let firstEventApplied = false;
+  let matchedCardId = null;
+
+  while (!matchedCardId) {
+    const cardId = drawOneHuntingCard();
+    if (!cardId) break;
+
+    const event = getHuntingEvent(cardId);
+    if (event) {
+      if (!firstEventApplied) {
+        firstEventApplied = true;
+        state.game.huntingRemoved.push(cardId);
+        eventHits.push({ id: cardId, handling: "triggered-removed" });
+        eventLog.push(`${event.name} 已触发并移出本局牌堆（具体效果请在线下结算）`);
+      } else {
+        skippedEventsToReturn.push(cardId);
+        eventHits.push({ id: cardId, handling: "skipped-returned" });
+        eventLog.push(`${event.name} 本次已跳过，稍后洗回公共牌堆`);
+      }
+      continue;
+    }
+
+    const card = getHuntingCard(cardId);
+    if (card && card.size === targetSize) {
+      matchedCardId = cardId;
+      break;
+    }
+    scoutingDiscard.push(cardId);
+  }
+
+  state.game.huntingDiscard.push(...scoutingDiscard);
+
+  if (skippedEventsToReturn.length > 0) {
+    state.game.huntingDeck = shuffle([...state.game.huntingDeck, ...skippedEventsToReturn]);
+  }
+
+  if (!matchedCardId) {
+    setHubMessage("狩猎牌堆中未找到符合体型的猎物，本次狩猎结束。");
+    saveState();
+    renderAll();
+    return;
+  }
+
+  state.game.huntingAction = {
+    playerId,
+    step: "decision",
+    targetSize,
+    matchedCardId,
+    baseAttack: 0,
+    useRifle: false,
+    rifleBonus: 0,
+    useShotgun: false,
+    shotgunBonus: 0,
+    eventLog,
+    eventHits
+  };
+
+  const eventText = eventLog.length > 0 ? ` 事件：${eventLog.join("；")}` : "";
+  setHubMessage(`${player.name} 已发现目标猎物，准备决策。${eventText}`);
+  saveState();
+  renderAll();
+}
+
+function renderHuntingDecisionStep(action) {
+  const card = getHuntingCard(action.matchedCardId);
+  if (!card) {
+    state.game.huntingAction = null;
+    saveState();
+    renderAll();
+    return;
+  }
+
+  const eventToggleHtml = action.eventHits?.length
+    ? `
+      <div class="event-section">
+        <p class="notice">本次抽到事件牌（${action.eventHits.length}）</p>
+        <div id="eventCardsPanel" class="event-cards-grid">
+          ${action.eventHits.map((entry) => renderHuntingEventCard(entry.id, entry.handling)).join("")}
+        </div>
+      </div>
+    `
+    : "";
+
+  dom.huntingContent.innerHTML = `
+    <section class="step-block">
+      <h3>阶段 2：自动搜寻结果</h3>
+      <p>目标体型 ${action.targetSize}，已锁定猎物：</p>
+      ${eventToggleHtml}
+      ${renderHuntingCardPreview(card)}
+      <div class="modal-actions">
+        <button id="avoidHuntBtn" class="ghost-btn" type="button"><i data-lucide="wind" aria-hidden="true"></i><span>避开 (Avoid)</span></button>
+        <button id="encounterHuntBtn" class="launch-btn" type="button"><i data-lucide="swords" aria-hidden="true"></i><span>遭遇 (Encounter)</span></button>
+      </div>
+    </section>
+  `;
+
+  document.getElementById("avoidHuntBtn").addEventListener("click", () => {
+    state.game.huntingDiscard.push(card.id);
+    finishHuntingAction(action.playerId, `已避开 ${card.name}，猎物已弃置。`);
+  });
+
+  document.getElementById("encounterHuntBtn").addEventListener("click", () => {
+    action.step = "encounter";
+    saveState();
+    renderAll();
+  });
+}
+
+function renderHuntingEncounterStep(action) {
+  const card = getHuntingCard(action.matchedCardId);
+  if (!card) {
+    state.game.huntingAction = null;
+    saveState();
+    renderAll();
+    return;
+  }
+
+  const rifleBonus = action.useRifle ? Number(action.rifleBonus || 0) : 0;
+  const shotgunBonus = action.useShotgun ? Number(action.shotgunBonus || 0) : 0;
+  const baseAttack = Number(action.baseAttack || 0);
+  const finalAttack = baseAttack + rifleBonus + shotgunBonus;
+  const success = finalAttack >= card.health;
+  const rifleOptions = Array.from({ length: card.size + 1 }, (_, idx) => idx)
+    .map((value) => `<button class="modifier-chip ${rifleBonus === value ? "active" : ""}" type="button" data-rifle-value="${value}" ${action.useRifle ? "" : "disabled"}>+${value}</button>`)
+    .join("");
+  const shotgunOptions = [
+    { value: 1, label: "+1" },
+    { value: 0, label: "0" },
+    { value: -1, label: "-1" }
+  ]
+    .map((option) => `<button class="modifier-chip ${shotgunBonus === option.value ? "active" : ""}" type="button" data-shotgun-value="${option.value}" ${action.useShotgun ? "" : "disabled"}>${option.label}</button>`)
+    .join("");
+
+  dom.huntingContent.innerHTML = `
+    <section class="step-block">
+      <h3>阶段 3：战斗计算器</h3>
+      ${renderHuntingCardPreview(card)}
+      <div class="combat-grid">
+        <div class="combat-row weapon-block">
+          <label>基础攻击力（打出的扑克牌总点数）</label>
+          <div class="modifier-chip-row">
+            <button class="modifier-chip" type="button" data-attack-delta="-5">-5</button>
+            <button class="modifier-chip" type="button" data-attack-delta="-1">-1</button>
+            <button class="modifier-chip" type="button" data-attack-delta="1">+1</button>
+            <button class="modifier-chip" type="button" data-attack-delta="5">+5</button>
+          </div>
+          <p class="notice">基础攻击力：${baseAttack}</p>
+        </div>
+        <div class="combat-row weapon-block">
+          <button id="useRifleBtn" class="ghost-btn modifier-toggle ${action.useRifle ? "active" : ""}" type="button"><i data-lucide="crosshair" aria-hidden="true"></i><span>使用步枪 (Rifle)</span></button>
+          <div class="modifier-chip-row">${rifleOptions}</div>
+          <p class="notice">步枪加成：${rifleBonus}</p>
+        </div>
+        <div class="combat-row weapon-block">
+          <button id="useShotgunBtn" class="ghost-btn modifier-toggle ${action.useShotgun ? "active" : ""}" type="button"><i data-lucide="bomb" aria-hidden="true"></i><span>使用霰弹枪 (Shotgun)</span></button>
+          <div class="modifier-chip-row">${shotgunOptions}</div>
+          <p class="notice">霰弹枪修正：${shotgunBonus >= 0 ? `+${shotgunBonus}` : shotgunBonus}</p>
+        </div>
+      </div>
+      <p class="notice">最终攻击值：<strong>${finalAttack}</strong>，目标生命：<strong>${card.health}</strong>，当前判定：<strong>${success ? "可击杀" : "攻击不足"}</strong></p>
+      <div class="modal-actions">
+        <button id="resolveHuntBtn" class="launch-btn" type="button"><i data-lucide="crosshair" aria-hidden="true"></i><span>开火结算</span></button>
+      </div>
+    </section>
+  `;
+
+  dom.huntingContent.querySelectorAll("[data-attack-delta]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const delta = Number(button.dataset.attackDelta || 0);
+      action.baseAttack = Math.max(0, Number(action.baseAttack || 0) + delta);
+      saveState();
+      renderHuntingFlow();
+    });
+  });
+
+  document.getElementById("useRifleBtn").addEventListener("click", () => {
+    action.useRifle = !action.useRifle;
+    if (!action.useRifle) action.rifleBonus = 0;
+    saveState();
+    renderHuntingFlow();
+  });
+
+  document.getElementById("useShotgunBtn").addEventListener("click", () => {
+    action.useShotgun = !action.useShotgun;
+    if (!action.useShotgun) action.shotgunBonus = 0;
+    saveState();
+    renderHuntingFlow();
+  });
+
+  dom.huntingContent.querySelectorAll("[data-rifle-value]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!action.useRifle) return;
+      action.rifleBonus = Number(button.dataset.rifleValue || 0);
+      saveState();
+      renderHuntingFlow();
+    });
+  });
+
+  dom.huntingContent.querySelectorAll("[data-shotgun-value]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!action.useShotgun) return;
+      action.shotgunBonus = Number(button.dataset.shotgunValue || 0);
+      saveState();
+      renderHuntingFlow();
+    });
+  });
+
+  document.getElementById("resolveHuntBtn").addEventListener("click", () => resolveHuntingEncounter(action));
+}
+
+function resolveHuntingEncounter(action) {
+  const player = getPlayerById(action.playerId);
+  const card = getHuntingCard(action.matchedCardId);
+  if (!player || !card) return;
+
+  const baseAttack = Number(action.baseAttack || 0);
+  const rifleBonus = action.useRifle ? Number(action.rifleBonus || 0) : 0;
+  const shotgunBonus = action.useShotgun ? Number(action.shotgunBonus || 0) : 0;
+  const finalAttack = baseAttack + rifleBonus + shotgunBonus;
+
+  if (finalAttack < card.health) {
+    state.game.huntingDiscard.push(card.id);
+    finishHuntingAction(player.playerId, "攻击力不足，狩猎失败，猎物已弃置。\n（事件和额外效果请按实体版规则结算）");
+    return;
+  }
+
+  const repercussion = Math.min(finalAttack - card.health, card.repercussions);
+  player.huntingBag.push(card.id);
+
+  if (getPlayerHuntingTotals(player).value > 120) {
+    action.step = "overlimit";
+    setHubMessage(`狩猎成功！获得奖励：${card.reward}。反噬次数：${repercussion}（请在线下结算）。超过 $120 上限，请先丢弃猎物。`);
+    saveState();
+    renderAll();
+    return;
+  }
+
+  finishHuntingAction(player.playerId, `狩猎成功！获得奖励：${card.reward}。反噬次数：${repercussion}（请在线下结算）。`);
+}
+
+function renderHuntingOverlimitStep(action) {
+  const player = getPlayerById(action.playerId);
+  if (!player) return;
+
+  const cardsHtml = player.huntingBag
+    .map((cardId) => renderPanelCard(cardId, "hunting-limit-check", "hunting"))
+    .join("");
+
+  dom.huntingContent.innerHTML = `
+    <section class="step-block">
+      <h3>阶段 4：入包上限处理</h3>
+      <p class="notice warn">猎物总价值超过 $120。请勾选要丢弃的猎物，直到总价值不超过 $120。</p>
+      <p id="huntingLimitHint" class="notice"></p>
+      <div class="creeling-scroll-list">${cardsHtml}</div>
+      <div class="modal-actions">
+        <button id="confirmHuntingTrimBtn" class="launch-btn" type="button">确认丢弃并结束狩猎</button>
+      </div>
+    </section>
+  `;
+
+  bindHighlightSelection(".hunting-limit-check", ".panel-card");
+
+  const hintEl = document.getElementById("huntingLimitHint");
+  const confirmBtn = document.getElementById("confirmHuntingTrimBtn");
+
+  const sync = () => {
+    const selected = getCheckedValues(".hunting-limit-check");
+    const selectedValue = selected.reduce((sum, cardId) => sum + (getHuntingCard(cardId)?.price || 0), 0);
+    const currentValue = getPlayerHuntingTotals(player).value;
+    const afterValue = currentValue - selectedValue;
+    hintEl.textContent = `当前 $${currentValue} / 120，已选丢弃价值 $${selectedValue}，丢弃后 $${afterValue}`;
+    confirmBtn.disabled = afterValue > 120;
+  };
+
+  dom.huntingContent.querySelectorAll(".hunting-limit-check").forEach((input) => {
+    input.addEventListener("change", sync);
+  });
+
+  sync();
+
+  confirmBtn.addEventListener("click", () => {
+    const selected = getCheckedValues(".hunting-limit-check");
+    const selectedSet = new Set(selected);
+    const afterValue = player.huntingBag
+      .filter((cardId) => !selectedSet.has(cardId))
+      .reduce((sum, cardId) => sum + (getHuntingCard(cardId)?.price || 0), 0);
+
+    if (afterValue > 120) {
+      setHubMessage("仍超过 $120 上限，请继续选择要丢弃的猎物。");
+      renderHub();
+      return;
+    }
+
+    player.huntingBag = player.huntingBag.filter((cardId) => !selectedSet.has(cardId));
+    finishHuntingAction(player.playerId, `已完成上限处理，当前猎物总价值 $${afterValue}。`);
+  });
+}
+
+function finishHuntingAction(playerId, message) {
+  const player = getPlayerById(playerId);
+
+  if (state.game.huntingDiscard.length > 0) {
+    state.game.huntingDeck = shuffle([...state.game.huntingDeck, ...state.game.huntingDiscard]);
+    state.game.huntingDiscard = [];
+  }
+
+  state.game.huntingAction = null;
+  setHubMessage(`${player?.name || "玩家"}：${message}`);
+  saveState();
+  renderAll();
+}
+
+function renderHuntingCardPreview(card) {
+  return `
+    <article class="panel-card hunting-card-choice">
+      <img src="${card.image}" alt="${card.name}" />
+      <h3>${card.name}${card.isLegendary ? " (Legendary)" : ""}</h3>
+      <p>体型 ${card.size} | 生命 ${card.health} | 价格 $${card.price} | 反噬上限 ${card.repercussions}</p>
+      <p>奖励：${card.reward}</p>
+    </article>
+  `;
+}
+
+function renderHuntingEventCard(eventCardId, handling) {
+  const event = getHuntingEvent(eventCardId);
+  if (!event) return "";
+
+  const handlingText = handling === "triggered-removed"
+    ? "已触发并移出本局"
+    : handling === "skipped-returned"
+      ? "本次已跳过，已洗回公共牌堆"
+      : "后续事件，已弃置";
+
+  return `
+    <article class="panel-card event-card">
+      <img src="${event.image}" alt="${event.name}" />
+      <h3>${event.name}</h3>
+      <p>${handlingText}</p>
+    </article>
+  `;
 }
 
 function renderFishingFlow() {
@@ -953,6 +1550,19 @@ function drawOneCard() {
   return state.game.drawPile.pop();
 }
 
+function drawOneHuntingCard() {
+  if (state.game.huntingDeck.length === 0 && state.game.huntingDiscard.length > 0) {
+    state.game.huntingDeck = shuffle([...state.game.huntingDiscard]);
+    state.game.huntingDiscard = [];
+  }
+
+  if (state.game.huntingDeck.length === 0) {
+    return null;
+  }
+
+  return state.game.huntingDeck.pop();
+}
+
 function moveCardToDiscard(cardId, reason) {
   const card = getCard(cardId);
   if (!card) return;
@@ -1001,6 +1611,18 @@ function getPlayerCreelTotals(player) {
   );
 }
 
+function getPlayerHuntingTotals(player) {
+  return player.huntingBag.reduce(
+    (acc, cardId) => {
+      const card = getHuntingCard(cardId);
+      if (!card) return acc;
+      acc.value += Number(card.price || 0);
+      return acc;
+    },
+    { value: 0 }
+  );
+}
+
 function bindHighlightSelection(inputSelector, containerSelector) {
   const inputs = Array.from(document.querySelectorAll(inputSelector));
   inputs.forEach((input) => {
@@ -1026,6 +1648,18 @@ function getEmptyCreelingSummary() {
 
 function getCard(cardId) {
   return state.catalogMap.get(cardId);
+}
+
+function getHuntingCard(cardId) {
+  return state.huntingCatalogMap.get(cardId);
+}
+
+function getHuntingEvent(cardId) {
+  return state.huntingEventMap.get(cardId);
+}
+
+function getHuntingDeckSeedIds() {
+  return [...state.huntingCatalog.map((card) => card.id), ...state.huntingEvents.map((event) => event.id)];
 }
 
 function shuffle(list) {

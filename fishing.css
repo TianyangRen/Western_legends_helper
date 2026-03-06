@@ -76,12 +76,8 @@ body {
 .hub-stage::after {
   content: "";
   position: absolute;
-  width: 160%;
-  height: 160%;
-  left: 50%;
-  top: 50%;
-  background: url("Expansions/Fishing_v5/back.jpg") center / cover no-repeat;
-  transform: translate(-50%, -50%) rotate(90deg) scale(1.24);
+  inset: 0;
+  background: url("Expansions/back.png") center / 100% 100% no-repeat;
   opacity: 0.12;
   pointer-events: none;
   z-index: 0;
@@ -146,6 +142,11 @@ body {
   padding: 10px;
   color: var(--text-dim);
   min-height: 42px;
+}
+
+.action-launch-stack {
+  display: grid;
+  gap: 8px;
 }
 
 .launch-btn,
@@ -256,13 +257,29 @@ input:focus-visible {
   margin-top: 4px;
 }
 
-.player-chip .chip-fish-count {
+.player-chip .chip-player-name {
+  display: block;
+}
+
+.player-chip .chip-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.player-chip .chip-line-item {
   display: inline-flex;
   align-items: center;
   gap: 4px;
 }
 
-.player-chip .chip-fish-count svg {
+.player-chip .chip-divider {
+  opacity: 0.78;
+}
+
+.player-chip .chip-line svg {
   width: 1em;
   height: 1em;
   flex: 0 0 auto;
@@ -297,6 +314,10 @@ input:focus-visible {
 }
 
 .fishing-modal {
+  width: min(1320px, 99vw);
+}
+
+.hunting-modal {
   width: min(1320px, 99vw);
 }
 
@@ -385,7 +406,12 @@ select {
 }
 
 .fishing-content .panel-card img {
-  height: min(46vh, 380px);
+  width: 80%;
+  height: auto;
+  max-height: none;
+  object-fit: contain;
+  margin: 0 auto;
+  display: block;
 }
 
 .steeling-fish-card,
@@ -426,6 +452,11 @@ select {
   gap: 12px;
 }
 
+.hunting-content {
+  display: grid;
+  gap: 12px;
+}
+
 .step-block {
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -441,6 +472,120 @@ select {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.inventory-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 2px;
+  grid-column: 1 / -1;
+}
+
+.inventory-btn.active {
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.hunting-card-choice {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px;
+  background: var(--panel-2);
+}
+
+.event-section {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.event-section .ghost-btn {
+  justify-self: start;
+}
+
+.event-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.hunting-content .hunting-card-choice img,
+.event-card img,
+.event-cards-grid .panel-card img {
+  width: 80%;
+  height: auto;
+  max-height: none;
+  object-fit: contain;
+  margin: 0 auto;
+  display: block;
+  background: #070604;
+}
+
+.combat-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.combat-row {
+  display: grid;
+  gap: 6px;
+}
+
+.combat-row input[type="number"] {
+  min-height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--text-main);
+  padding: 8px 10px;
+}
+
+.weapon-block {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px;
+  background: rgba(184, 146, 95, 0.08);
+}
+
+.modifier-toggle {
+  justify-self: start;
+}
+
+.modifier-toggle.active {
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.modifier-chip-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.modifier-chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-2);
+  color: var(--text-main);
+  min-height: 36px;
+  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.modifier-chip.active {
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  background: rgba(184, 146, 95, 0.18);
+}
+
+.modifier-chip:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .player-btn {
@@ -666,6 +811,10 @@ select {
   }
 
   .fishing-modal {
+    width: 99vw;
+  }
+
+  .hunting-modal {
     width: 99vw;
   }
 }

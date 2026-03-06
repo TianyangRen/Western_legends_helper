@@ -26,18 +26,29 @@
       <section class="center-hub panel">
         <div class="stats-row">
           <article class="stat-card">
-            <h2>公共牌堆</h2>
-            <p><span id="drawCount">0</span> 张</p>
+            <h2>钓鱼公共牌堆</h2>
+            <p><span id="fishDrawCount">0</span> 张</p>
           </article>
           <article class="stat-card">
-            <h2>弃牌堆</h2>
-            <p><span id="discardCount">0</span> 张</p>
+            <h2>钓鱼弃牌堆</h2>
+            <p><span id="fishDiscardCount">0</span> 张</p>
+          </article>
+          <article class="stat-card">
+            <h2>狩猎公共牌堆</h2>
+            <p><span id="huntDrawCount">0</span> 张</p>
+          </article>
+          <article class="stat-card">
+            <h2>狩猎弃牌堆</h2>
+            <p><span id="huntDiscardCount">0</span> 张</p>
           </article>
         </div>
 
-        <div id="hubStatus" class="hub-status">请先进入设置并生成鱼池。</div>
+        <div id="hubStatus" class="hub-status">请先进入设置并生成牌堆。</div>
 
-        <button id="startFishingBtn" class="launch-btn" type="button"><i data-lucide="fishing-rod" aria-hidden="true"></i><span>发起钓鱼行动</span></button>
+        <div class="action-launch-stack">
+          <button id="startHuntingBtn" class="launch-btn" type="button"><i data-lucide="crosshair" aria-hidden="true"></i><span>发起狩猎行动</span></button>
+          <button id="startFishingBtn" class="launch-btn" type="button"><i data-lucide="fishing-rod" aria-hidden="true"></i><span>发起钓鱼行动</span></button>
+        </div>
       </section>
 
       <aside id="playerDock" class="player-dock" aria-label="玩家页签"></aside>
@@ -63,7 +74,7 @@
 
       <footer class="modal-actions">
         <button id="resetStorageBtn" class="ghost-btn danger" type="button">清空本地对局</button>
-        <button id="generateGameBtn" class="launch-btn" type="button">生成公共鱼池并开始</button>
+        <button id="generateGameBtn" class="launch-btn" type="button">生成排堆并开始</button>
       </footer>
     </section>
   </div>
@@ -92,6 +103,17 @@
       </header>
 
       <div id="fishingContent" class="fishing-content"></div>
+    </section>
+  </div>
+
+  <div id="huntingOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="huntingFlowTitle">
+    <section class="modal panel hunting-modal">
+      <header class="modal-head">
+        <h2 id="huntingFlowTitle">狩猎行动流</h2>
+        <button id="closeHuntingBtn" class="icon-btn" type="button" aria-label="关闭狩猎行动">×</button>
+      </header>
+
+      <div id="huntingContent" class="hunting-content"></div>
     </section>
   </div>
 
