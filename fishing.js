@@ -385,7 +385,7 @@ function generateGameFromSetup() {
   state.game.huntingRemoved = [];
   state.game.huntingAction = null;
   state.game.initialized = true;
-  setHubMessage(`垂钓牌堆已生成，共 ${state.game.drawPile.length} 张；狩猎牌堆已生成，共 ${state.game.huntingDeck.length} 张。`);
+  setHubMessage(`钓鱼牌堆已生成，共 ${state.game.drawPile.length} 张；狩猎牌堆已生成，共 ${state.game.huntingDeck.length} 张。`);
 
   saveState();
   closeSetup();
