@@ -103,7 +103,7 @@ body {
   position: absolute;
   inset: 50% auto auto 50%;
   transform: translate(-50%, -50%);
-  width: min(92vw, 620px);
+  width: min(73.6vw, 496px);
   padding: 18px;
   display: grid;
   gap: 14px;
