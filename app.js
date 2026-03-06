@@ -29,7 +29,7 @@ const DATA = {
         "结算“回合结束”能力和效果",
         "结算满足条件的事件牌",
         "弃牌至手牌上限：基础5张，每受1伤上限-1",
-        "通缉犯按当前通缉等级所在行获得 LP",
+        "通缉玩家按当前通缉等级所在行获得 LP",
         "检查游戏结束条件，然后轮到左手玩家"
       ],
       tags: ["结束", "弃牌", "LP", "通缉"]
@@ -79,25 +79,25 @@ const DATA = {
       tags: ["AP", "战斗"]
     },
     {
-      section: "免费行动",
+      section: "耗费0AP",
       title: "反应牌",
       lines: ["满足条件时可随时打出反应牌，不消耗AP"],
       tags: ["免费", "反应牌"]
     },
     {
-      section: "免费行动",
+      section: "耗费0AP",
       title: "交牛 / 偷运",
       lines: ["到达对应牧场或火车站时自动触发相关结算"],
       tags: ["免费", "牛", "偷运"]
     },
     {
-      section: "免费行动",
+      section: "耗费0AP",
       title: "遭遇匪窝",
       lines: ["路过匪窝自动停止并触发战斗判定"],
       tags: ["免费", "匪窝", "战斗"]
     },
     {
-      section: "免费行动",
+      section: "耗费0AP",
       title: "途经特殊点",
       lines: ["火车站、匪窝、运牛目的地等按规则触发"],
       tags: ["免费", "触发"]
@@ -114,11 +114,12 @@ const DATA = {
   ],
   combat: [
     {
-      section: "核心提醒",
-      title: "战斗共通提醒",
+      section: "通用",
+      title: "战斗通用提醒",
       lines: [
         "好人做坏事会立刻清零警官点，转为通缉犯",
         "平局算发起者胜,与NPC平局算发起者败，投降算发起者败",
+        "警长/银行安保/匪徒 战斗时抽 5/4/3张战斗牌",
       ],
       tags: ["阵营", "警官点", "通缉"]
     },
@@ -154,7 +155,7 @@ const DATA = {
       section: "打匪徒",
       title: "打匪徒（被动触发）",
       lines: [
-        "匪徒抽5张战斗牌，选择一张打出",
+        "匪徒抽3张战斗牌，选择一张打出",
         "胜利：移除匪徒；非通缉状态得 1LP 或 1警官点，通缉状态得 1LP",
         "失败（平局算败）：受1伤+抽1牌，并移除匪徒"
       ],
@@ -174,7 +175,7 @@ const DATA = {
   locations: [
     {
       section: "通用",
-      title: "地点共通规则",
+      title: "地点通用规则",
       lines: ["绝大多数地点都可执行“收购”行动，使用 1AP 支付费用获取地契牌",
               "被通缉玩家无法进入警长办公室所在地块"
       ],
@@ -204,7 +205,7 @@ const DATA = {
       title: "银行",
       lines: [
         "兑现金块：使用 1AP，每兑现1金块得 $20 + 1LP",
-        "抢劫银行（每回合限1次）：使用 1AP，银行保安抓4牌打其中一张，玩家赢则+3通缉点并拿$80；输则+1通缉点、受1伤、抽1牌"
+        "抢劫银行（每回合限1次）：使用 1AP，银行安保抓4牌打其中一张，玩家赢则+3通缉点并拿$80；输则+1通缉点、受1伤、抽1牌"
       ],
       tags: ["银行", "金块", "LP", "通缉"]
     },
@@ -361,8 +362,8 @@ function getCardIcon(tab, item) {
   }
 
   if (tab === "actions") {
-    if (item.section === "耗费1AP") return "hand";
-    if (item.section === "免费行动") return "badge-check";
+    if (item.section === "耗费1AP") return "hexagon-number-1";
+    if (item.section === "耗费0AP") return "hexagon-number-0";
     if (item.section === "冒险骰") return "dices";
     return "zap";
   }
@@ -398,6 +399,45 @@ function getCardIcon(tab, item) {
   return "book-open";
 }
 
+function createTablerHexagonIcon(name) {
+  const SVG_NS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(SVG_NS, "svg");
+
+  svg.setAttribute("xmlns", SVG_NS);
+  svg.setAttribute("width", "24");
+  svg.setAttribute("height", "24");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("fill", "currentColor");
+  svg.setAttribute("class", `icon icon-tabler icons-tabler-filled icon-tabler-${name}`);
+
+  const bgPath = document.createElementNS(SVG_NS, "path");
+  bgPath.setAttribute("stroke", "none");
+  bgPath.setAttribute("d", "M0 0h24v24H0z");
+  bgPath.setAttribute("fill", "none");
+  svg.appendChild(bgPath);
+
+  const iconPath = document.createElementNS(SVG_NS, "path");
+  iconPath.setAttribute(
+    "d",
+    name === "hexagon-number-0"
+      ? "M10.425 1.414a3.33 3.33 0 0 1 3.216 0l6.775 3.995c.067 .04 .127 .084 .18 .133l.008 .007l.107 .076a3.223 3.223 0 0 1 1.284 2.39l.005 .203v7.284c0 1.175 -.643 2.256 -1.623 2.793l-6.804 4.302c-.98 .538 -2.166 .538 -3.2 -.032l-6.695 -4.237a3.226 3.226 0 0 1 -1.678 -2.826v-7.285a3.21 3.21 0 0 1 1.65 -2.808zm1.575 5.586a3 3 0 0 0 -2.995 2.824l-.005 .176v4l.005 .176a3 3 0 0 0 5.99 0l.005 -.176v-4l-.005 -.176a3 3 0 0 0 -2.995 -2.824zm0 2a1 1 0 0 1 .993 .883l.007 .117v4l-.007 .117a1 1 0 0 1 -1.986 0l-.007 -.117v-4l.007 -.117a1 1 0 0 1 .993 -.883z"
+      : "M10.425 1.414a3.33 3.33 0 0 1 3.216 0l6.775 3.995c.067 .04 .127 .084 .18 .133l.008 .007l.107 .076a3.223 3.223 0 0 1 1.284 2.39l.005 .203v7.284c0 1.175 -.643 2.256 -1.623 2.793l-6.804 4.302c-.98 .538 -2.166 .538 -3.2 -.032l-6.695 -4.237a3.226 3.226 0 0 1 -1.678 -2.826v-7.285a3.21 3.21 0 0 1 1.65 -2.808zm.952 5.803l-.084 .076l-2 2l-.083 .094a1 1 0 0 0 0 1.226l.083 .094l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l.293 -.293v5.586l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-8l-.006 -.114c-.083 -.777 -1.008 -1.16 -1.617 -.67z"
+  );
+  svg.appendChild(iconPath);
+
+  return svg;
+}
+
+function createIconNode(iconName) {
+  if (iconName === "hexagon-number-0" || iconName === "hexagon-number-1") {
+    return createTablerHexagonIcon(iconName);
+  }
+
+  const icon = document.createElement("i");
+  icon.setAttribute("data-lucide", iconName);
+  return icon;
+}
+
 function refreshLucideIcons() {
   if (window.lucide && typeof window.lucide.createIcons === "function") {
     window.lucide.createIcons();
@@ -411,8 +451,7 @@ function createRuleCard(item, tab, query) {
   const title = document.createElement("h3");
   title.className = "rule-title";
 
-  const icon = document.createElement("i");
-  icon.setAttribute("data-lucide", getCardIcon(tab, item));
+  const icon = createIconNode(getCardIcon(tab, item));
 
   const text = document.createElement("span");
   setHighlightedText(text, cleanTitle(item.title), query);
